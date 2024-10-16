@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import { Poppins } from "next/font/google";
 import { SidebarProvider } from "@/components/sidebar/provider";
 import "@/app/globals.css";
+import { cn } from "@/lib/utils";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -16,21 +17,17 @@ export const metadata = {
 
 export default function MainLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={font.className}>
-        <main className="flex h-screen">
-          <SidebarProvider>
-            <Sidebar />
-            <div className="flex flex-col flex-1 h-full overflow-hidden bg-[#F3F3F3]">
-              <Header />
-              <div className="flex-1 overflow-auto px-9 py-6">{children}</div>
-              <footer className="bg-white text-[#253763] text-center py-4">
-                © 2024 Anggi Company. All rights reserved.
-              </footer>
-            </div>
-          </SidebarProvider>
-        </main>
-      </body>
-    </html>
+    <main className={cn(font.className, "flex h-screen")}>
+      <SidebarProvider>
+        <Sidebar />
+        <div className="flex flex-col flex-1 h-full overflow-hidden bg-[#F3F3F3]">
+          <Header />
+          <div className="flex-1 overflow-auto px-9 py-6">{children}</div>
+          <footer className="bg-white text-[#253763] text-center py-4">
+            © 2024 Anggi Company. All rights reserved.
+          </footer>
+        </div>
+      </SidebarProvider>
+    </main>
   );
 }
