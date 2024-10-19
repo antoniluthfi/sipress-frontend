@@ -1,7 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   return (
     <main className="min-h-screen bg-[url('/images/bg_work.png')] bg-cover">
       <div className="flex flex-col items-center justify-center gap-10 h-screen w-[40%] bg-[#1D3163] p-24">
@@ -16,17 +21,13 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 w-2/4">
-          <p className="text-white text-2xl text-center">Login Sebagai</p>
-          <div className="flex items-center justify-between w-full">
-            <Button variant="outline" className="font-bold">
-              DOSEN
-            </Button>
-            <Button variant="outline" className="font-bold">
-              ADMIN
-            </Button>
-          </div>
-        </div>
+        <Button
+          variant="outline"
+          className="font-bold w-full"
+          onClick={() => router.push("/login")}
+        >
+          Login
+        </Button>
       </div>
     </main>
   );
