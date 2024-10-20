@@ -13,6 +13,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/useAuthStore";
+import { PATH_NAME } from "@/lib/utils";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -21,32 +22,32 @@ const Sidebar = () => {
 
   const MENU = [
     {
-      href: "/dashboard",
+      href: PATH_NAME.DASHBOARD,
       icon: <LayoutDashboardIcon />,
       title: "Dashboard",
     },
     {
-      href: "/course",
+      href: PATH_NAME.COURSE,
       icon: <BookIcon />,
       title: "Mata Kuliah",
     },
     {
-      href: "/student",
+      href: PATH_NAME.STUDENT,
       icon: <UserIcon />,
       title: "Mahasiswa",
     },
     {
-      href: "/lecturer",
+      href: PATH_NAME.LECTURER,
       icon: <BookUserIcon />,
       title: "Dosen",
     },
     {
-      href: "/attendance",
+      href: PATH_NAME.ATTENDANCE,
       icon: <NotebookPenIcon />,
       title: "Presensi",
     },
     {
-      href: "/",
+      href: PATH_NAME.LANDING_PAGE,
       icon: <LogOutIcon />,
       title: "Logout",
     },

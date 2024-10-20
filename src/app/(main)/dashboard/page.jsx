@@ -5,11 +5,10 @@ import Carousel from "@/components/carousel";
 import TableCurrentLecturerSchedule from "@/components/table-current-lecturer-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserCircleIcon } from "lucide-react";
-import { getUserLocalStorage } from "@/lib/utils";
+import useAuthStore from "@/store/useAuthStore";
 
 const DashboardPage = () => {
-  const user = getUserLocalStorage();
-  console.log(user);
+  const { user } = useAuthStore();
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-10">
@@ -28,7 +27,7 @@ const DashboardPage = () => {
                 Selamat Siang
               </h4>
               <p className="text-2xl text-[#253763] text-center font-bold">
-                {user?.name || '-'}
+                {user?.name || "-"}
               </p>
             </div>
           </CardContent>

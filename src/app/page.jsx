@@ -1,11 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  useAuthenticateUser();
 
   return (
     <main className="min-h-screen bg-[url('/images/bg_work.png')] bg-cover">

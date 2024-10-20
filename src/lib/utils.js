@@ -5,7 +5,22 @@ export function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export function getUserLocalStorage() {
-  const data = localStorage.getItem("user");
-  return JSON.parse(data);
-}
+export const PATH_NAME = {
+  LANDING_PAGE: "/",
+  LOGIN: "/login",
+  DASHBOARD: "/dashboard",
+  COURSE: "/course",
+  STUDENT: "/student",
+  LECTURER: "/lecturer",
+  ATTENDANCE: "/attendance",
+};
+
+export const GUEST_ROUTES = [PATH_NAME.LANDING_PAGE, PATH_NAME.LOGIN];
+
+export const PROTECTED_ROUTES = [
+  PATH_NAME.DASHBOARD,
+  PATH_NAME.COURSE,
+  PATH_NAME.STUDENT,
+  PATH_NAME.LECTURER,
+  PATH_NAME.ATTENDANCE,
+];

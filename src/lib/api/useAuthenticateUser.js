@@ -3,6 +3,7 @@
 import useAuthStore from "@/store/useAuthStore";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GUEST_ROUTES, PROTECTED_ROUTES } from "../utils";
 
 export const useAuthenticateUser = () => {
   const pathName = usePathname();
@@ -28,12 +29,14 @@ export const useAuthenticateUser = () => {
       setData(resJson?.data || null);
       saveUser(resJson?.data);
 
-      if (['/', '/login'].includes(pathName)) {
+      if (GUEST_ROUTES.includes(pathName)) {
         router.push('/dashboard');
       }
     } else {
       removeUser();
-      router.push("/login");
+      if (PROTECTED_ROUTES.includes(pathName)) {
+        router.push("/login");
+      }
     }
   };
 
