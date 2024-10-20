@@ -4,14 +4,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Clock, MapPin, MoreHorizontal } from "lucide-react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,6 +19,7 @@ import DeleteCourseModal from "@/components/course-page/delete-course-modal";
 import { useCourseList } from "@/lib/api/useCourseList";
 import useDebounce from "@/lib/hooks/useDebounce";
 import LoadingSpinner from "@/components/loading-spinner";
+import CustomPagination from "@/components/custom-pagination";
 
 const CoursePage = () => {
   const router = useRouter();
@@ -37,30 +30,6 @@ const CoursePage = () => {
 
   const debounceSearch = useDebounce(searchKeyword, 500);
   const courses = useCourseList({ page: currentPage, search: debounceSearch });
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const renderPaginationItems = () => {
-    let paginationItems = [];
-
-    for (let i = 1; i <= courses?.pagination?.totalPages || 0; i++) {
-      paginationItems.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            isActive={i === currentPage}
-            onClick={() => handlePageChange(i)}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return paginationItems;
-  };
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-10">
@@ -146,27 +115,12 @@ const CoursePage = () => {
             )}
           </div>
 
-          {courses?.data?.length > 0 ? (
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  />
-                </PaginationItem>
-                {renderPaginationItems()}
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === courses?.pagination?.totalPages}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          ) : null}
+          <CustomPagination
+            show={courses?.data?.length > 0}
+            onPageChange={(val) => setCurrentPage(val)}
+            currentPage={currentPage}
+            totalPages={courses?.pagination?.totalPages || 1}
+          />
         </div>
 
         <Card className="w-[40%]">

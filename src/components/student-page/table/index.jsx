@@ -14,14 +14,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import DeleteStudentModal from "../delete-student-modal";
+import useDebounce from "@/lib/hooks/useDebounce";
+import { useUserList } from "@/lib/api/useUserList";
+import CustomPagination from "@/components/custom-pagination";
 
 const StudentTable = () => {
   const router = useRouter();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const debounceSearch = useDebounce(searchKeyword, 500);
+  const students = useUserList({
+    page: currentPage,
+    search: debounceSearch,
+    role: "student",
+  });
 
   const columns = [
     {
-      accessorKey: "no",
+      accessorKey: "id",
       header: ({ column }) => {
         return (
           <div className="w-full flex items-center justify-center">
@@ -31,14 +43,14 @@ const StudentTable = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              No
+              ID
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
         );
       },
       cell: ({ row }) => (
-        <div className="uppercase text-center">{row.getValue("no")}</div>
+        <div className="uppercase text-center">{row.getValue("id")}</div>
       ),
     },
     {
@@ -200,64 +212,27 @@ const StudentTable = () => {
     },
   ];
 
-  const data = [
-    {
-      no: 1,
-      identification_number: "ID001",
-      name: "John Doe",
-      email: "email@gmail.com",
-      gender: "Male",
-      status: "Active",
-    },
-    {
-      no: 2,
-      identification_number: "ID002",
-      name: "Jane Smith",
-      email: "email@gmail.com",
-      gender: "Female",
-      status: "Inactive",
-    },
-    {
-      no: 3,
-      identification_number: "ID003",
-      name: "Michael Johnson",
-      email: "email@gmail.com",
-      gender: "Male",
-      status: "Active",
-    },
-    {
-      no: 4,
-      identification_number: "ID004",
-      name: "Emily Davis",
-      email: "email@gmail.com",
-      gender: "Female",
-      status: "Pending",
-    },
-    {
-      no: 5,
-      identification_number: "ID005",
-      name: "David Wilson",
-      email: "email@gmail.com",
-      gender: "Male",
-      status: "Inactive",
-    },
-  ];
-
   return (
     <>
       <DataTable
         columns={columns}
-        data={data}
-        filterComponent={({ table }) => (
+        data={students?.data || []}
+        filterComponent={() => (
           <Input
             placeholder="Filter mahasiswa..."
-            value={table.getColumn("name")?.getFilterValue() ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
             className="max-w-sm"
           />
         )}
+        paginationComponent={
+          <CustomPagination
+            show={students?.data?.length > 0}
+            onPageChange={(val) => setCurrentPage(val)}
+            currentPage={currentPage}
+            totalPages={students?.pagination?.totalPages || 1}
+          />
+        }
       />
 
       <DeleteStudentModal
