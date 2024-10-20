@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 
 const FormSchema = z.object({
   email: z
@@ -36,6 +37,8 @@ const LoginPage = () => {
       password: "12345678",
     },
   });
+
+  useAuthenticateUser();
 
   const onSubmit = async (data) => {
     const { email, password } = data;

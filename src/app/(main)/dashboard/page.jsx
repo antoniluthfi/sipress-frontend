@@ -1,10 +1,16 @@
+"use client";
+
 import React from "react";
 import Carousel from "@/components/carousel";
 import TableCurrentLecturerSchedule from "@/components/table-current-lecturer-schedule";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserCircleIcon } from "lucide-react";
+import { getUserLocalStorage } from "@/lib/utils";
 
 const DashboardPage = () => {
+  const user = getUserLocalStorage();
+  console.log(user);
+
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-10">
       <h3 className="text-3xl text-[#253763] font-semibold">Dashboard</h3>
@@ -22,7 +28,7 @@ const DashboardPage = () => {
                 Selamat Siang
               </h4>
               <p className="text-2xl text-[#253763] text-center font-bold">
-                Alam Rahmatullah
+                {user?.name || '-'}
               </p>
             </div>
           </CardContent>

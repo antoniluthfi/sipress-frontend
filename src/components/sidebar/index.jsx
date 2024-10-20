@@ -11,9 +11,13 @@ import {
   UserIcon,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useRouter } from "next/navigation";
+import useAuthStore from "@/store/useAuthStore";
 
 const Sidebar = () => {
+  const router = useRouter();
   const { isOpen } = useSidebar();
+  const { removeUser } = useAuthStore();
 
   const MENU = [
     {
@@ -48,6 +52,19 @@ const Sidebar = () => {
     },
   ];
 
+  const logout = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    router.push("/login");
+    removeUser();
+  };
+
   return (
     <div
       className={`h-screen bg-[#253763] text-white flex flex-col transform ${
@@ -62,29 +79,56 @@ const Sidebar = () => {
       </div>
       {isOpen ? (
         <nav className="flex flex-col flex-1">
-          {MENU.map((data) => (
-            <Link
-              key={data.title}
-              href={data.href}
-              className="flex items-center gap-7 py-[30px] px-20 hover:bg-white hover:text-[#253763] text-xl font-semibold whitespace-nowrap"
-            >
-              {data.icon}
-              {data.title}
-            </Link>
-          ))}
+          {MENU.map((data) => {
+            if (data.title === "Logout") {
+              return (
+                <button
+                  key={data.title}
+                  type="button"
+                  className="flex items-center gap-7 py-[30px] px-20 hover:bg-white hover:text-[#253763] text-xl font-semibold whitespace-nowrap"
+                  onClick={logout}
+                >
+                  {data.icon}
+                  {data.title}
+                </button>
+              );
+            }
+
+            return (
+              <Link
+                key={data.title}
+                href={data.href}
+                className="flex items-center gap-7 py-[30px] px-20 hover:bg-white hover:text-[#253763] text-xl font-semibold whitespace-nowrap"
+              >
+                {data.icon}
+                {data.title}
+              </Link>
+            );
+          })}
         </nav>
       ) : (
         <nav className="flex flex-col flex-1">
           {MENU.map((data) => (
             <Tooltip key={data.title} delayDuration={0}>
               <TooltipTrigger asChild>
-                <Link
-                  key={data.title}
-                  href={data.href}
-                  className="flex items-center justify-center py-[30px] hover:bg-white hover:text-[#253763] text-xl font-semibold"
-                >
-                  {data.icon}
-                </Link>
+                {data.title === "Logout" ? (
+                  <button
+                    key={data.title}
+                    type="button"
+                    className="flex items-center justify-center py-[30px] hover:bg-white hover:text-[#253763] text-xl font-semibold"
+                    onClick={logout}
+                  >
+                    {data.icon}
+                  </button>
+                ) : (
+                  <Link
+                    key={data.title}
+                    href={data.href}
+                    className="flex items-center justify-center py-[30px] hover:bg-white hover:text-[#253763] text-xl font-semibold"
+                  >
+                    {data.icon}
+                  </Link>
+                )}
               </TooltipTrigger>
               <TooltipContent side="right">
                 <p>{data.title}</p>
