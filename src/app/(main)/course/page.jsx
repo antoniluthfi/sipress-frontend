@@ -48,6 +48,8 @@ const CoursePage = () => {
                         alt="course"
                         className="object-cover"
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                        priority={true}
                       />
                     </div>
 

@@ -18,6 +18,7 @@ import AutocompleteInput from "@/components/autocomplete-input";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Mata kuliah harus diisi." }),
+  code: z.string().min(1, { message: "Kode Mata kuliah harus diisi." }),
   lecturer_id: z.number().min(1, { message: "Dosen harus diisi." }),
   room: z.string().min(1, { message: "Ruangan harus diisi." }),
   meeting_total: z
@@ -82,6 +83,25 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
                     {...field}
                     type="text"
                     placeholder="Masukkan Nama Mata Kuliah"
+                    className="h-[50px]"
+                    disabled={isViewMode}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kode Mata Kuliah</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="text"
+                    placeholder="Masukkan Kode Mata Kuliah"
                     className="h-[50px]"
                     disabled={isViewMode}
                   />

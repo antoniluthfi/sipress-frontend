@@ -2,28 +2,45 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import CourseForm from "@/components/course-page/course-form";
 import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ToastAction } from "@/components/ui/toast";
 
 const AddNewCoursePage = () => {
   const router = useRouter();
+  const { toast } = useToast();
 
-  const handleSubmit = (data) => {
-    console.log(data);
-    toast({
-      title: "Data mata kuliah berhasil ditambahkan!",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      action: (
-        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-      ),
-    });
+  const handleSubmit = async (data) => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/course`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const response = await res.json();
+        toast({
+          title: "Success",
+          description: response?.message,
+          variant: "success",
+        });
+        router.back();
+      } else {
+        const errorData = await res.json();
+        toast({
+          title: "Failed",
+          description: errorData?.error || errorData?.errors?.[0]?.msg,
+          variant: "danger",
+        });
+      }
+    } catch (err) {
+      console.log("An error occurred");
+    }
   };
 
   return (
@@ -41,10 +58,13 @@ const AddNewCoursePage = () => {
           <CourseForm
             defaultValues={{
               name: "",
+              code: "",
               lecturer_id: "",
               room: "",
-              meeting_total: 1,
-              meetings: [{ meeting_number: 1, date: "", start_time: "", end_time: "" }],
+              meeting_total: '1',
+              meetings: [
+                { meeting_number: 1, date: "", start_time: "", end_time: "" },
+              ],
             }}
             onSubmit={handleSubmit}
           />

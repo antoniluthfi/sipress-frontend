@@ -36,6 +36,7 @@ const CourseDetailPage = () => {
           <CourseForm
             defaultValues={{
               name: "",
+              code: "",
               lecturer_id: "",
               room: "",
               meeting_total: 1,
