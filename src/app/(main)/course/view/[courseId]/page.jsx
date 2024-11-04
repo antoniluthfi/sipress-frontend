@@ -38,8 +38,8 @@ const CourseDetailPage = () => {
               name: "",
               lecturer_id: "",
               room: "",
-              session_total: 1,
-              sessions: [{ date: "", start_time: "", end_time: "" }],
+              meeting_total: 1,
+              meetings: [{ meeting_number: 1, date: "", start_time: "", end_time: "" }],
             }}
             onSubmit={handleSubmit}
             mode="view"

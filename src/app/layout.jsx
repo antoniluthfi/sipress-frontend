@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning={true}>
       <body className={font.className}>
         <TooltipProvider>{children}</TooltipProvider>
+        <Toaster />
       </body>
     </html>
   );
