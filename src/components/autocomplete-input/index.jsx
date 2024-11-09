@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, useEffect, useRef, forwardRef } from "react";
 
 const AutocompleteInput = forwardRef(
-  ({ inputClassName, suggestions, suggestionClassName, ...props }, ref) => {
+  ({ inputClassName, suggestions, suggestionClassName, onSelectOption, defaultQuery, ...props }, ref) => {
     const [query, setQuery] = useState("");
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -54,7 +54,8 @@ const AutocompleteInput = forwardRef(
           } else if (event.key === "Enter" && selectedIndex >= 0) {
             const selectedSuggestion = filteredSuggestions[selectedIndex];
             setQuery(selectedSuggestion.name); // Tampilkan name
-            props.onChange(selectedSuggestion.id); // Set id sebagai nilai field
+            onSelectOption?.(selectedSuggestion.id);
+            props.onChange(selectedSuggestion.name);
             setFilteredSuggestions([]);
             setShowDropdown(false);
             setSelectedIndex(-1);
@@ -71,6 +72,7 @@ const AutocompleteInput = forwardRef(
     const handleInputChange = (e) => {
       const value = e.target.value;
       setQuery(value);
+      props.onChange(value);
       if (value.length > 0) {
         const filtered = suggestions.filter((suggestion) =>
           suggestion.name.toLowerCase().includes(value.toLowerCase())
@@ -87,11 +89,18 @@ const AutocompleteInput = forwardRef(
 
     const handleSuggestionClick = (suggestion) => {
       setQuery(suggestion.name); // Tampilkan nama saat dipilih
-      props.onChange(suggestion.id); // Set id sebagai nilai form
+      onSelectOption?.(suggestion.id);
+      props.onChange(suggestion.name);
       setFilteredSuggestions([]);
       setShowDropdown(false);
       setSelectedIndex(-1);
     };
+
+    useEffect(() => {
+      if (defaultQuery) {
+        setQuery(defaultQuery);
+      }
+    }, [defaultQuery]);
 
     return (
       <div ref={ref} className="relative w-full">

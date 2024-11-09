@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import AutocompleteInput from "@/components/autocomplete-input";
+import SelectLecturerInput from "../select-lecturer-input";
+import SelectLocationInput from "../select-location-input";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Mata kuliah harus diisi." }),
   code: z.string().min(1, { message: "Kode Mata kuliah harus diisi." }),
   lecturer_id: z.number().min(1, { message: "Dosen harus diisi." }),
-  room: z.string().min(1, { message: "Ruangan harus diisi." }),
+  location_id: z.number().min(1, { message: "Ruangan harus diisi." }),
   meeting_total: z
     .string()
     .min(1, { message: "Jumlah pertemuan harus diisi." }),
@@ -117,16 +118,13 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
               <FormItem>
                 <FormLabel>Dosen</FormLabel>
                 <FormControl>
-                  <AutocompleteInput
-                    {...field}
-                    suggestions={[
-                      { id: 1, name: "Antoni" },
-                      { id: 2, name: "Jono" },
-                      { id: 3, name: "Sumarno" },
-                      { id: 4, name: "Haniek" },
-                    ]}
-                    placeholder="Masukkan Nama Dosen"
+                  <SelectLecturerInput
+                    ref={field.ref}
+                    value={field.value}
                     disabled={isViewMode}
+                    onSelectOption={(val) => {
+                      form.setValue("lecturer_id", val);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -135,17 +133,18 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
           />
           <FormField
             control={form.control}
-            name="room"
+            name="location_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ruangan</FormLabel>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="text"
-                    placeholder="Masukkan Ruangan"
-                    className="h-[50px]"
+                  <SelectLocationInput
+                    ref={field.ref}
+                    value={field.value}
                     disabled={isViewMode}
+                    onSelectOption={(val) => {
+                      form.setValue("location_id", val);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

@@ -68,14 +68,14 @@ const CoursePage = () => {
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() =>
-                                router.push(`/course/view/${i + 1}`)
+                                router.push(`/course/view/${course?.id}`)
                               }
                             >
                               View Details
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
-                                router.push(`/course/edit/${i + 1}`)
+                                router.push(`/course/edit/${course?.id}`)
                               }
                             >
                               Edit
