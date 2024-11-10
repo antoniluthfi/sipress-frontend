@@ -73,6 +73,7 @@ const LoginPage = () => {
             width={163}
             height={136}
             alt="logo"
+            priority
           />
           <h2 className="text-white text-4xl font-bold text-center">
             LOGIN TO YOUR ACCOUNT

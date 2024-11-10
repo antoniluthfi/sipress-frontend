@@ -48,6 +48,8 @@ const Carousel = () => {
                     alt={`Slide ${slideIndex * 3 + index}`}
                     fill
                     className="object-cover rounded-md"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    priority
                   />
                 </div>
               ))}

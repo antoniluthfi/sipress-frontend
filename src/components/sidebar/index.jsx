@@ -74,7 +74,7 @@ const Sidebar = () => {
     >
       <div className="py-9 font-bold text-lg border-b border-gray-700">
         <div className="flex items-center justify-center gap-3 w-full">
-          <Image src="/images/ic_logo.png" width={48} height={40} alt="logo" />
+          <Image src="/images/ic_logo.png" width={48} height={40} alt="logo" priority />
           {isOpen && <h3 className="text-white text-3xl font-bold">SiPress</h3>}
         </div>
       </div>

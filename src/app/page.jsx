@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[url('/images/bg_work.png')] bg-cover">
       <div className="flex flex-col items-center justify-center gap-10 h-screen w-[40%] bg-[#1D3163] p-24">
-        <Image src="/images/ic_logo.png" width={163} height={136} alt="logo" />
+        <Image src="/images/ic_logo.png" width={163} height={136} alt="logo" priority />
 
         <div>
           <h2 className="text-white text-4xl font-bold text-center">

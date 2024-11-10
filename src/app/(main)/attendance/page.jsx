@@ -42,6 +42,8 @@ const AttendancePage = () => {
                         alt="course"
                         className="object-cover"
                         fill
+                        priority
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                       />
                     </div>
 
@@ -55,7 +57,9 @@ const AttendancePage = () => {
 
                       <div className="flex items-center gap-2">
                         <MapPin />
-                        <p className="text-base text-[#253763]">{course?.location_name}</p>
+                        <p className="text-base text-[#253763]">
+                          {course?.location_name}
+                        </p>
                       </div>
 
                       <div className="flex gap-2 items-center">

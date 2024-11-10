@@ -13,16 +13,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import DeleteStudentModal from "../delete-lecturer-modal";
 import { useUserList } from "@/lib/api/useUserList";
 import useDebounce from "@/lib/hooks/useDebounce";
 import CustomPagination from "@/components/custom-pagination";
+import DeleteLecturerModal from "../delete-lecturer-modal";
 
 const LecturerTable = () => {
   const router = useRouter();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedId, setSelectedId] = useState("");
 
   const debounceSearch = useDebounce(searchKeyword, 500);
   const lecturers = useUserList({
@@ -200,6 +201,7 @@ const LecturerTable = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(e) => {
+                  setSelectedId(row.getValue("id"));
                   setOpenDeleteModal(true);
                 }}
               >
@@ -235,9 +237,14 @@ const LecturerTable = () => {
         }
       />
 
-      <DeleteStudentModal
+      <DeleteLecturerModal
+        selectedId={selectedId}
         isModalOpen={openDeleteModal}
+        open={true}
         closeModal={() => setOpenDeleteModal(false)}
+        onSuccess={() => {
+          lecturers.refetch();
+        }}
       />
     </>
   );
