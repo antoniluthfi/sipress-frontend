@@ -102,7 +102,7 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
                   type="email"
                   placeholder="Masukkan Email"
                   className="h-[50px]"
-                  disabled={isViewMode}
+                  disabled={mode !== "new"}
                 />
               </FormControl>
               <FormMessage />
