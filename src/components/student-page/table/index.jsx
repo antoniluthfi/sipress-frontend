@@ -23,6 +23,7 @@ const StudentTable = () => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedId, setSelectedId] = useState("");
 
   const debounceSearch = useDebounce(searchKeyword, 500);
   const students = useUserList({
@@ -200,6 +201,7 @@ const StudentTable = () => {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(e) => {
+                  setSelectedId(row.getValue("id"));
                   setOpenDeleteModal(true);
                 }}
               >
@@ -236,8 +238,12 @@ const StudentTable = () => {
       />
 
       <DeleteStudentModal
+        selectedId={selectedId}
         isModalOpen={openDeleteModal}
         closeModal={() => setOpenDeleteModal(false)}
+        onSuccess={() => {
+          students.refetch();
+        }}
       />
     </>
   );

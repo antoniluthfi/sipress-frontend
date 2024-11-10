@@ -43,5 +43,5 @@ export const useUserList = ({
     fetchData();
   }, [page, limit, search]);
 
-  return { data, pagination, isLoading };
+  return { data, pagination, isLoading, refetch: fetchData };
 };
