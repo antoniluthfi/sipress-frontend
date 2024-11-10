@@ -5,13 +5,14 @@ import { ArrowUpDown } from "lucide-react";
 import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import GenerateQrCodeModal from "../generate-qr-code-modal";
+import { format } from "date-fns";
 
-const DoAttendanceTable = () => {
+const DoAttendanceTable = ({ data, courseId, courseName }) => {
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
 
   const columns = [
     {
-      accessorKey: "meeting",
+      accessorKey: "meeting_number",
       header: ({ column }) => {
         return (
           <div className="w-full flex items-center justify-center">
@@ -28,28 +29,7 @@ const DoAttendanceTable = () => {
         );
       },
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("meeting")}</div>
-      ),
-    },
-    {
-      accessorKey: "room",
-      header: ({ column }) => {
-        return (
-          <div className="w-full flex items-center justify-center">
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Ruangan
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue("room")}</div>
+        <div className="text-center">{row.getValue("meeting_number")}</div>
       ),
     },
     {
@@ -69,12 +49,15 @@ const DoAttendanceTable = () => {
           </div>
         );
       },
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue("date")}</div>
-      ),
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("date"));
+        const formattedDate = format(date.toLocaleDateString(), "yyyy-MM-dd");
+
+        return <div className="text-center">{formattedDate}</div>;
+      },
     },
     {
-      accessorKey: "time",
+      accessorKey: "start_time",
       header: ({ column }) => {
         return (
           <div className="w-full flex items-center justify-center">
@@ -89,9 +72,33 @@ const DoAttendanceTable = () => {
           </div>
         );
       },
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue("time")}</div>
-      ),
+      cell: ({ row }) => {
+        const formattedStartTime = row.getValue("start_time").substring(0, 5); // Mengambil HH:mm
+
+        return <div className="text-center">{formattedStartTime}</div>;
+      },
+    },
+    {
+      accessorKey: "end_time",
+      header: ({ column }) => {
+        return (
+          <div className="w-full flex items-center justify-center">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Waktu
+            </Button>
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        const formattedEndTime = row.getValue("end_time").substring(0, 5); // Mengambil HH:mm
+
+        return <div className="text-center">{formattedEndTime}</div>;
+      },
     },
     {
       accessorKey: "functions",
@@ -125,48 +132,12 @@ const DoAttendanceTable = () => {
     },
   ];
 
-  const data = [
-    {
-      id: "m5gr84i9",
-      meeting: 1,
-      date: "13 September 2023",
-      time: "09.00 - 12.00",
-      room: "LT1-2A",
-    },
-    {
-      id: "3u1reuv4",
-      meeting: 2,
-      date: "13 September 2023",
-      time: "09.00 - 12.00",
-      room: "LT1-2A",
-    },
-    {
-      id: "derv1ws0",
-      meeting: 3,
-      date: "13 September 2023",
-      time: "09.00 - 12.00",
-      room: "LT1-2A",
-    },
-    {
-      id: "5kma53ae",
-      meeting: 4,
-      date: "13 September 2023",
-      time: "09.00 - 12.00",
-      room: "LT1-2A",
-    },
-    {
-      id: "bhqecj4p",
-      meeting: 5,
-      date: "13 September 2023",
-      time: "09.00 - 12.00",
-      room: "LT1-2A",
-    },
-  ];
-
   return (
     <>
       <DataTable columns={columns} data={data} />
       <GenerateQrCodeModal
+      courseId={courseId}
+        courseName={courseName}
         isModalOpen={openQrCodeModal}
         closeModal={() => {
           setOpenQrCodeModal(false);

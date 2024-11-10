@@ -1,10 +1,21 @@
 "use client";
 
+import LoadingSpinner from "@/components/loading-spinner";
 import Modal from "@/components/modal";
+import { useGenerateQrCode } from "@/lib/api/useGenerateQrCode";
 import { useQRCode } from "next-qrcode";
 
-const GenerateQrCodeModal = ({ isModalOpen, closeModal }) => {
+const GenerateQrCodeModal = ({
+  isModalOpen,
+  closeModal,
+  courseId,
+  courseName,
+}) => {
   const { Canvas } = useQRCode();
+  const { data, isLoading } = useGenerateQrCode({
+    courseMeetingId: courseId,
+    enable: isModalOpen,
+  });
 
   return (
     <Modal
@@ -14,21 +25,23 @@ const GenerateQrCodeModal = ({ isModalOpen, closeModal }) => {
     >
       <div>
         <h2 className="text-xl font-bold text-center">S1 Teknik Informatika</h2>
-        <p className="text-base text-center">
-          Introduction to Computer Science
-        </p>
+        <p className="text-base text-center">{courseName}</p>
       </div>
 
-      <Canvas
-        text={"https://github.com/bunlong/next-qrcode"}
-        options={{
-          errorCorrectionLevel: "M",
-          margin: 3,
-          scale: 4,
-          width: 800,
-        }}
-        className="w-full max-w-[800px]"
-      />
+      {isLoading ? (
+        <LoadingSpinner isLoading={isLoading} />
+      ) : (
+        <Canvas
+          text={data?.qr_code || "-"}
+          options={{
+            errorCorrectionLevel: "M",
+            margin: 3,
+            scale: 4,
+            width: 800,
+          }}
+          className="w-full max-w-[800px]"
+        />
+      )}
     </Modal>
   );
 };
