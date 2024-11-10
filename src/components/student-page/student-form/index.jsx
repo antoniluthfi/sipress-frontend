@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -45,16 +45,24 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      form.setValue('profile_url', file);
+      form.setValue("profile_url", file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
     } else {
-      form.setValue('profile_url', ""); // Set ke string kosong jika tidak ada file
+      form.setValue("profile_url", ""); // Set ke string kosong jika tidak ada file
       setImagePreview(null);
     }
   };
 
   const isViewMode = mode === "view";
+
+  useEffect(() => {
+    if (mode !== "new" && defaultValues?.profile_url) {
+      setImagePreview(
+        process.env.NEXT_PUBLIC_BE_URL + defaultValues?.profile_url
+      );
+    }
+  }, [mode, defaultValues?.profile_url]);
 
   return (
     <Form {...form}>
@@ -197,24 +205,26 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
         />
 
         {/* Input Profile Image */}
-        <FormField
-          name="profile_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Profile Image</FormLabel>
-              <FormControl>
-                <Input
-                  type="file"
-                  className="h-[50px]"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  disabled={isViewMode}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!isViewMode && (
+          <FormField
+            name="profile_url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Profile Image</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    className="h-[50px]"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={isViewMode}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Preview Gambar */}
         {imagePreview && (
