@@ -5,12 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import CourseForm from "@/components/course-page/course-form";
 import { ArrowLeftIcon } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCourseDetails } from "@/lib/api/useCourseDetails";
 import LoadingSpinner from "@/components/loading-spinner";
 import { format } from "date-fns";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 
 const EditCoursePage = () => {
+  const pathname = usePathname();
+  useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
@@ -18,14 +21,17 @@ const EditCoursePage = () => {
 
   const handleSubmit = async (formData) => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/course/${params?.courseId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/course/${params?.courseId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         const response = await res.json();
@@ -47,7 +53,6 @@ const EditCoursePage = () => {
       console.log("An error occurred");
     }
   };
-
 
   if (isLoading) {
     return <LoadingSpinner isLoading={isLoading} />;
@@ -72,17 +77,20 @@ const EditCoursePage = () => {
               meetings: (data?.meetings || []).map((meeting) => {
                 const date = new Date(meeting.date);
 
-                const formattedDate = format(date.toLocaleDateString(), 'yyyy-MM-dd');
+                const formattedDate = format(
+                  date.toLocaleDateString(),
+                  "yyyy-MM-dd"
+                );
                 const formattedStartTime = meeting.start_time.substring(0, 5); // Mengambil HH:mm
                 const formattedEndTime = meeting.end_time.substring(0, 5); // Mengambil HH:mm
-    
+
                 return {
                   ...meeting,
                   date: formattedDate,
                   start_time: formattedStartTime,
                   end_time: formattedEndTime,
-                }
-              })
+                };
+              }),
             }}
             onSubmit={handleSubmit}
           />

@@ -3,10 +3,13 @@
 import StudentTable from "@/components/student-page/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { PATH_NAME } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const StudentPage = () => {
+  useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.STUDENT });
   const router = useRouter();
 
   return (

@@ -186,14 +186,14 @@ const StudentTable = () => {
             <DropdownMenuContent>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push(`/student/view/${row.getValue("no")}`)
+                  router.push(`/student/view/${row.getValue("id")}`)
                 }
               >
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push(`/student/edit/${row.getValue("no")}`)
+                  router.push(`/student/edit/${row.getValue("id")}`)
                 }
               >
                 Edit

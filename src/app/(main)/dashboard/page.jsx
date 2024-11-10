@@ -6,8 +6,10 @@ import TableCurrentLecturerSchedule from "@/components/table-current-lecturer-sc
 import { Card, CardContent } from "@/components/ui/card";
 import { UserCircleIcon } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 
 const DashboardPage = () => {
+  useAuthenticateUser();
   const { user } = useAuthStore();
 
   return (

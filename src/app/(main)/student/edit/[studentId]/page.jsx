@@ -2,11 +2,14 @@
 
 import StudentForm from "@/components/student-page/student-form";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { ArrowLeftIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
 const EditStudentPage = () => {
+  const pathname = usePathname();
+  useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   const router = useRouter();
 
   return (

@@ -5,12 +5,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import CourseForm from "@/components/course-page/course-form";
 import { ArrowLeftIcon } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useCourseDetails } from "@/lib/api/useCourseDetails";
 import LoadingSpinner from "@/components/loading-spinner";
 import { format } from "date-fns";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 
 const CourseDetailPage = () => {
+  const pathname = usePathname();
+  useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   const router = useRouter();
   const params = useParams();
   const { data, isLoading } = useCourseDetails(params?.courseId);

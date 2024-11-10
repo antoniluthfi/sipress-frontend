@@ -6,8 +6,11 @@ import { useToast } from "@/components/ui/use-toast";
 import CourseForm from "@/components/course-page/course-form";
 import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { PATH_NAME } from "@/lib/utils";
 
 const AddNewCoursePage = () => {
+  useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.COURSE_NEW });
   const router = useRouter();
   const { toast } = useToast();
 
@@ -61,7 +64,7 @@ const AddNewCoursePage = () => {
               code: "",
               lecturer_id: "",
               room: "",
-              meeting_total: '1',
+              meeting_total: "1",
               meetings: [
                 { meeting_number: 1, date: "", start_time: "", end_time: "" },
               ],

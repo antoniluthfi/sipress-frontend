@@ -12,6 +12,7 @@ export const PATH_NAME = {
   COURSE: "/course",
   COURSE_NEW: "/course/new",
   STUDENT: "/student",
+  STUDENT_NEW: "/student/new",
   LECTURER: "/lecturer",
   ATTENDANCE: "/attendance",
 };

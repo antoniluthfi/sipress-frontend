@@ -4,10 +4,10 @@ import { MenuIcon, UserCircleIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSidebar } from "../sidebar/provider";
 import { Search } from "../ui/search";
-import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import useAuthStore from "@/store/useAuthStore";
 
 const Header = () => {
-  const user = useAuthenticateUser();
+  const { user } = useAuthStore();
   const { toggleSidebar } = useSidebar();
 
   return (

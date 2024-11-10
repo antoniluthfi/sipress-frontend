@@ -1,13 +1,25 @@
 "use client";
 
+import LoadingSpinner from "@/components/loading-spinner";
 import StudentForm from "@/components/student-page/student-form";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { useUserDetails } from "@/lib/api/useUserDetails";
 import { ArrowLeftIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import React from "react";
 
 const StudentDetailPage = () => {
+  const pathname = usePathname();
+  useAuthenticateUser({ authenticatedRedirectRoute: pathname });
+  
   const router = useRouter();
+  const params = useParams();
+  const { data, isLoading } = useUserDetails(params?.studentId);
+
+  if (isLoading) {
+    return <LoadingSpinner isLoading={isLoading} />;
+  }
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-10">
@@ -23,16 +35,7 @@ const StudentDetailPage = () => {
         <CardContent className="flex flex-col p-5 gap-5">
           <StudentForm
             mode="view"
-            defaultValues={{
-              name: "test",
-              email: "test@gmail.com",
-              gender: "Laki-laki",
-              nim: "186327163",
-              address: "jl. test 1",
-              phoneNumber: "09982867862",
-              profileUrl: "",
-              status: "Aktif",
-            }}
+            defaultValues={data}
             onSubmit={(data) => console.log(data)}
           />
         </CardContent>

@@ -2,49 +2,58 @@
 
 import useAuthStore from "@/store/useAuthStore";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { GUEST_ROUTES, PROTECTED_ROUTES } from "../utils";
+import { useEffect, useState, useCallback } from "react";
+import { PATH_NAME } from "../utils";
 
-export const useAuthenticateUser = () => {
+export const useAuthenticateUser = (route) => {
   const pathName = usePathname();
   const router = useRouter();
-  const {saveUser, removeUser} = useAuthStore();
+  const { saveUser, removeUser } = useAuthStore();
 
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchData = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/authenticated-user`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/authenticated-user`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch authenticated user");
       }
-    );
 
-    if (res.ok) {
       const resJson = await res.json();
       setData(resJson?.data || null);
       saveUser(resJson?.data);
-
-      if (GUEST_ROUTES.includes(pathName)) {
-        router.push('/dashboard');
-      }
-    } else {
+      router.push(route?.authenticatedRedirectRoute || PATH_NAME.DASHBOARD);
+    } catch (error) {
+      console.error("Authentication failed:", error);
       removeUser();
-      if (PROTECTED_ROUTES.includes(pathName)) {
-        router.push("/login");
-      }
+      router.push(route?.redirectRoute || PATH_NAME.LOGIN);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [route]);
 
   useEffect(() => {
-    if (pathName) {
+    let isMounted = true;
+
+    if (pathName && isMounted) {
       fetchData();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [pathName]);
 
-  return data;
+  return { data, isLoading };
 };

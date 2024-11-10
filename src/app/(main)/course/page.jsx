@@ -20,8 +20,11 @@ import { useCourseList } from "@/lib/api/useCourseList";
 import useDebounce from "@/lib/hooks/useDebounce";
 import LoadingSpinner from "@/components/loading-spinner";
 import CustomPagination from "@/components/custom-pagination";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { PATH_NAME } from "@/lib/utils";
 
 const CoursePage = () => {
+  useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.COURSE });
   const router = useRouter();
 
   const [currentPage, setCurrentPage] = useState(1);
