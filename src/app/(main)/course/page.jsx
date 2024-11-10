@@ -30,6 +30,7 @@ const CoursePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [selectedId, setSelectedId] = useState("");
 
   const debounceSearch = useDebounce(searchKeyword, 500);
   const courses = useCourseList({ page: currentPage, search: debounceSearch });
@@ -85,6 +86,7 @@ const CoursePage = () => {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onSelect={(e) => {
+                                setSelectedId(course?.id);
                                 setOpenDeleteModal(true);
                               }}
                             >
@@ -99,7 +101,9 @@ const CoursePage = () => {
 
                       <div className="flex items-center gap-2">
                         <MapPin />
-                        <p className="text-base text-[#253763]">LT1-2A</p>
+                        <p className="text-base text-[#253763]">
+                          {course?.location_name || "-"}
+                        </p>
                       </div>
 
                       <div className="flex items-center justify-between px-2 py-1 bg-[#253763] rounded-md w-[130px]">
@@ -148,9 +152,13 @@ const CoursePage = () => {
         </Card>
 
         <DeleteCourseModal
+          selectedId={selectedId}
           isModalOpen={openDeleteModal}
           closeModal={() => {
             setOpenDeleteModal(false);
+          }}
+          onSuccess={() => {
+            courses.refetch();
           }}
         />
       </div>

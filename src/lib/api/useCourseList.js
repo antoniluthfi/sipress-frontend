@@ -38,5 +38,5 @@ export const useCourseList = ({ page = 1, limit = 5, search = "" }) => {
     fetchData();
   }, [page, limit, search]);
 
-  return { data, pagination, isLoading };
+  return { data, pagination, isLoading, refetch: fetchData };
 };
