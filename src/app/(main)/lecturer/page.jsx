@@ -3,10 +3,13 @@
 import LecturerTable from "@/components/lecturer-page/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { PATH_NAME } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const LecturerPage = () => {
+  useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.LECTURER });
   const router = useRouter();
 
   return (

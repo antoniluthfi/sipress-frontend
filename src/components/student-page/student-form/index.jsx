@@ -163,7 +163,7 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
           name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Nomor Telpon</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -208,9 +208,9 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
         {!isViewMode && (
           <FormField
             name="profile_url"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
-                <FormLabel>Profile Image</FormLabel>
+                <FormLabel>Foto Profil</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
@@ -229,7 +229,7 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
         {/* Preview Gambar */}
         {imagePreview && (
           <div className="lg:col-span-2">
-            <FormLabel>Image Preview</FormLabel>
+            <FormLabel>Preview Foto Profil</FormLabel>
             <img src={imagePreview} alt="Preview" className="max-w-sm h-auto" />
           </div>
         )}

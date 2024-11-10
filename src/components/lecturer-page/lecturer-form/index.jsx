@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -26,10 +27,10 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "Nama harus diisi" }),
   email: z.string().email({ message: "Email tidak valid" }),
   gender: z.string().min(1, { message: "Jenis kelamin harus diisi" }),
-  nim: z.string().min(1, { message: "NIM harus diisi" }),
+  identification_number: z.string().min(1, { message: "NIDN harus diisi" }),
   address: z.string().min(1, { message: "Alamat harus diisi" }),
-  phoneNumber: z.string().min(1, { message: "Nomor telpon harus diisi" }),
-  profileUrl: z.any(),
+  phone_number: z.string().min(1, { message: "Nomor telpon harus diisi" }),
+  profile_url: z.any(),
   status: z.string().min(1, { message: "Status harus diisi" }),
 });
 
@@ -39,8 +40,29 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
     defaultValues,
   });
 
-  // Menonaktifkan input jika dalam mode view
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      form.setValue("profile_url", file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    } else {
+      form.setValue("profile_url", ""); // Set ke string kosong jika tidak ada file
+      setImagePreview(null);
+    }
+  };
+
   const isViewMode = mode === "view";
+
+  useEffect(() => {
+    if (mode !== "new" && defaultValues?.profile_url) {
+      setImagePreview(
+        process.env.NEXT_PUBLIC_BE_URL + defaultValues?.profile_url
+      );
+    }
+  }, [mode, defaultValues?.profile_url]);
 
   return (
     <Form {...form}>
@@ -80,7 +102,7 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
                   type="email"
                   placeholder="Masukkan Email"
                   className="h-[50px]"
-                  disabled={isViewMode}
+                  disabled={mode !== "new"}
                 />
               </FormControl>
               <FormMessage />
@@ -106,8 +128,8 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Laki-laki">Laki-laki</SelectItem>
-                    <SelectItem value="Perempuan">Perempuan</SelectItem>
+                    <SelectItem value="male">Laki-laki</SelectItem>
+                    <SelectItem value="female">Perempuan</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -118,15 +140,15 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
 
         {/* Input NIM */}
         <FormField
-          name="nim"
+          name="identification_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>NIM</FormLabel>
+              <FormLabel>NIDN</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="number"
-                  placeholder="Masukkan NIM"
+                  placeholder="Masukkan NIDN"
                   className="h-[50px]"
                   disabled={isViewMode}
                 />
@@ -138,36 +160,16 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
 
         {/* Input Phone Number */}
         <FormField
-          name="phoneNumber"
+          name="phone_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>Nomor Telpon</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="number"
                   placeholder="Masukkan Nomor Telpon"
                   className="h-[50px]"
-                  disabled={isViewMode}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Input Profile URL */}
-        <FormField
-          name="profileUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Profile URL</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="file"
-                  className="h-[50px]"
-                  accept="image/*"
                   disabled={isViewMode}
                 />
               </FormControl>
@@ -193,14 +195,44 @@ const LecturerForm = ({ mode, defaultValues, onSubmit }) => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Aktif">Aktif</SelectItem>
-                  <SelectItem value="Tidak Aktif">Tidak Aktif</SelectItem>
+                  <SelectItem value="active">Aktif</SelectItem>
+                  <SelectItem value="inactive">Tidak Aktif</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {/* Input Profile Image */}
+        {!isViewMode && (
+          <FormField
+            name="profile_url"
+            render={() => (
+              <FormItem>
+                <FormLabel>Foto Profil</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    className="h-[50px]"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    disabled={isViewMode}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* Preview Gambar */}
+        {imagePreview && (
+          <div className="lg:col-span-2">
+            <FormLabel>Preview Foto Profil</FormLabel>
+            <img src={imagePreview} alt="Preview" className="max-w-sm h-auto" />
+          </div>
+        )}
 
         {/* Input Address */}
         <FormField

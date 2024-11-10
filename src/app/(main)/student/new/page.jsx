@@ -25,7 +25,6 @@ const AddNewStudentPage = () => {
     formData.append("status", data.status);
     formData.append("role", "student");
 
-    console.log(data.profile_url);
     if (data.profile_url) {
       formData.append("profile_url", data.profile_url);
     }

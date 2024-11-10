@@ -64,7 +64,7 @@ const LecturerTable = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              NIM
+              NIDN
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -186,14 +186,14 @@ const LecturerTable = () => {
             <DropdownMenuContent>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push(`/student/view/${row.getValue("no")}`)
+                  router.push(`/lecturer/view/${row.getValue("id")}`)
                 }
               >
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
-                  router.push(`/student/edit/${row.getValue("no")}`)
+                  router.push(`/lecturer/edit/${row.getValue("id")}`)
                 }
               >
                 Edit
