@@ -16,7 +16,7 @@ const Header = () => {
         <Button variant="outline" onClick={toggleSidebar}>
           <MenuIcon />
         </Button>
-        <Search className="w-[430px]" placeholder="Search" />
+        <Search className="w-[430px]" placeholder="Cari" />
       </div>
 
       <div className="flex items-center gap-9">

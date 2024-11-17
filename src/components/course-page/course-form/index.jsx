@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SelectLecturerInput from "../select-lecturer-input";
 import SelectLocationInput from "../select-location-input";
+import { Trash } from "lucide-react";
 
 const FormSchema = z.object({
   name: z.string().min(1, { message: "Mata kuliah harus diisi." }),
@@ -43,6 +44,11 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
     defaultValues,
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "meetings",
+  });
+
   const sessionTotal = useWatch({
     control: form.control,
     name: "meeting_total",
@@ -63,7 +69,6 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
     form.setValue("meetings", newSessions);
   }, [sessionTotal]);
 
-  // Menonaktifkan input jika dalam mode view
   const isViewMode = mode === "view";
 
   return (
@@ -73,6 +78,7 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
         className="w-full space-y-6 flex flex-col items-end"
       >
         <div className="w-full grid grid-cols-2 gap-5 items-center">
+          {/* Input Fields */}
           <FormField
             control={form.control}
             name="name"
@@ -111,6 +117,7 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
               </FormItem>
             )}
           />
+          {/* Select Inputs */}
           <FormField
             control={form.control}
             name="lecturer_id"
@@ -173,10 +180,10 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
           />
         </div>
         <div className="w-full">
-          {form.watch("meetings").map((_, index) => (
+          {fields.map((field, index) => (
             <div
-              key={index}
-              className="w-full grid grid-cols-4 gap-5 items-center py-5 border-b-2 border-secondary"
+              key={field.id}
+              className="w-full grid grid-cols-5 gap-5 items-center py-5 border-b-2 border-secondary"
             >
               <FormLabel>Pertemuan ke-{index + 1}</FormLabel>
               <FormField
@@ -233,8 +240,34 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
                   </FormItem>
                 )}
               />
+              {!isViewMode && (
+                <Button
+                  variant="destructive"
+                  onClick={() => remove(index)}
+                  className="mt-6 gap-2"
+                >
+                  <Trash className="w-5 h-5" />
+                  Hapus
+                </Button>
+              )}
             </div>
           ))}
+          {!isViewMode && (
+            <Button
+              variant="default"
+              onClick={() =>
+                append({
+                  meeting_number: fields.length + 1,
+                  date: "",
+                  start_time: "",
+                  end_time: "",
+                })
+              }
+              className="mt-4"
+            >
+              Tambah Pertemuan
+            </Button>
+          )}
         </div>
         {!isViewMode && <Button variant="default">Submit</Button>}
       </form>

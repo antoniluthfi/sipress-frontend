@@ -27,7 +27,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const DataTable = ({ columns = [], data = [], filterComponent, paginationComponent }) => {
+const DataTable = ({
+  columns = [],
+  columnFilter = undefined,
+  data = [],
+  filterComponent,
+  paginationComponent,
+}) => {
   const [sorting, setSorting] = React.useState([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -59,7 +65,7 @@ const DataTable = ({ columns = [], data = [], filterComponent, paginationCompone
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+              Kolom <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -76,7 +82,7 @@ const DataTable = ({ columns = [], data = [], filterComponent, paginationCompone
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {columnFilter?.[column.id] || column.id}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -138,9 +144,7 @@ const DataTable = ({ columns = [], data = [], filterComponent, paginationCompone
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
-          {paginationComponent}
-        </div>
+        <div className="space-x-2">{paginationComponent}</div>
       </div>
     </div>
   );

@@ -101,7 +101,7 @@ const AttendancePage = () => {
             <CardTitle className="text-xl border-b-[1px] border-[#253763]">
               Cari Mata Kuliah
             </CardTitle>
-            <Search placeholder="Search" />
+            <Search placeholder="Cari data" />
           </CardContent>
         </Card>
       </div>

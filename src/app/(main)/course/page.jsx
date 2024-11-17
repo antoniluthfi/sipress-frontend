@@ -68,21 +68,21 @@ const CoursePage = () => {
                             <MoreHorizontal />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuLabel>Functions</DropdownMenuLabel>
+                            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={() =>
                                 router.push(`/course/view/${course?.id}`)
                               }
                             >
-                              View Details
+                              Lihat Detail
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() =>
                                 router.push(`/course/edit/${course?.id}`)
                               }
                             >
-                              Edit
+                              Ubah
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onSelect={(e) => {
@@ -90,7 +90,7 @@ const CoursePage = () => {
                                 setOpenDeleteModal(true);
                               }}
                             >
-                              Delete
+                              Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -138,7 +138,7 @@ const CoursePage = () => {
               Cari Mata Kuliah
             </CardTitle>
             <Search
-              placeholder="Search"
+              placeholder="Cari data"
               onChange={(e) => setSearchKeyword(e.target.value)}
             />
 

@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import GenerateQrCodeModal from "../generate-qr-code-modal";
 import { format, isBefore, isAfter, addMinutes } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import { useParams, useRouter } from "next/navigation";
 
 const DoAttendanceTable = ({ data, courseName }) => {
+  const router = useRouter();
+  const params = useParams();
   const { toast } = useToast();
+
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedCourseMeetingId, setSelectedCourseMeetingId] = useState("");
 
@@ -126,7 +130,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Functions
+            Aksi
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -137,7 +141,18 @@ const DoAttendanceTable = ({ data, courseName }) => {
         const endTime = row.getValue("end_time");
 
         return (
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              onClick={() => {
+                router.push(
+                  `/attendance/do/${
+                    params?.id
+                  }/manual-attendance/${row.getValue("id")}`
+                );
+              }}
+            >
+              Absensi Manual
+            </Button>
             <Button
               variant="destructive"
               onClick={() => {
@@ -145,7 +160,8 @@ const DoAttendanceTable = ({ data, courseName }) => {
                 if (disabled) {
                   toast({
                     title: "Failed",
-                    description: "Kode QR tidak bisa dibuat diluar rentang waktu yang telah ditentukan!",
+                    description:
+                      "Kode QR tidak bisa dibuat diluar rentang waktu yang telah ditentukan!",
                     variant: "danger",
                   });
                 } else {
@@ -155,7 +171,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
               }}
               disabled={isQrCodeDisabled(date, startTime, endTime)}
             >
-              Kode QR
+              Absensi Kode QR
             </Button>
           </div>
         );

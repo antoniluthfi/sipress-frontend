@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import DataTable from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -51,6 +51,7 @@ const LocationTable = () => {
       cell: ({ row }) => (
         <div className="uppercase text-center">{row.getValue("id")}</div>
       ),
+      alias: "ID",
     },
     {
       accessorKey: "name",
@@ -72,6 +73,7 @@ const LocationTable = () => {
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("name")}</div>
       ),
+      alias: "Nama",
     },
     {
       accessorKey: "latitude",
@@ -147,7 +149,7 @@ const LocationTable = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Functions
+              Aksi
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -165,14 +167,14 @@ const LocationTable = () => {
                   router.push(`/location/view/${row.getValue("id")}`)
                 }
               >
-                View Details
+                Lihat Detail
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
                   router.push(`/location/edit/${row.getValue("id")}`)
                 }
               >
-                Edit
+                Ubah
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(e) => {
@@ -180,19 +182,32 @@ const LocationTable = () => {
                   setOpenDeleteModal(true);
                 }}
               >
-                Delete
+                Hapus
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       ),
+      alias: "Aksi",
     },
   ];
+
+  const columnFilter = useMemo(() => {
+    if (columns.length) {
+      return columns.reduce((acc, col) => {
+        acc[col.accessorKey] = col.alias;
+        return acc;
+      }, {});
+    }
+  
+    return {};
+  }, [columns.length]);
 
   return (
     <>
       <DataTable
         columns={columns}
+        columnFilter={columnFilter}
         data={locations?.data || []}
         filterComponent={() => (
           <Input

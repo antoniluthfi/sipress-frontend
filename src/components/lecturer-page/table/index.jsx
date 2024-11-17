@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import DataTable from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,7 @@ const LecturerTable = () => {
       cell: ({ row }) => (
         <div className="uppercase text-center">{row.getValue("id")}</div>
       ),
+      alias: "ID",
     },
     {
       accessorKey: "identification_number",
@@ -76,6 +77,7 @@ const LecturerTable = () => {
           {row.getValue("identification_number")}
         </div>
       ),
+      alias: "NIDN",
     },
     {
       accessorKey: "name",
@@ -97,6 +99,7 @@ const LecturerTable = () => {
       cell: ({ row }) => (
         <div className="capitalize">{row.getValue("name")}</div>
       ),
+      alias: "Nama",
     },
     {
       accessorKey: "gender",
@@ -109,15 +112,19 @@ const LecturerTable = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Gender
+              Jenis Kelamin
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
         );
       },
-      cell: ({ row }) => (
-        <div className="uppercase text-center">{row.getValue("gender")}</div>
-      ),
+      cell: ({ row }) => {
+        const gender =
+          row.getValue("gender") === "male" ? "Laki-laki" : "Perempuan";
+
+        return <div className="uppercase text-center">{gender}</div>;
+      },
+      alias: "Jenis Kelamin",
     },
     {
       accessorKey: "email",
@@ -137,6 +144,7 @@ const LecturerTable = () => {
         );
       },
       cell: ({ row }) => <div>{row.getValue("email")}</div>,
+      alias: "Email",
     },
     {
       accessorKey: "status",
@@ -160,6 +168,7 @@ const LecturerTable = () => {
           <Badge variant="success">Active</Badge>
         </div>
       ),
+      alias: "Status",
     },
     {
       accessorKey: "functions",
@@ -172,7 +181,7 @@ const LecturerTable = () => {
                 column.toggleSorting(column.getIsSorted() === "asc")
               }
             >
-              Functions
+              Aksi
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -190,14 +199,14 @@ const LecturerTable = () => {
                   router.push(`/lecturer/view/${row.getValue("id")}`)
                 }
               >
-                View Details
+                Lihat Detail
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() =>
                   router.push(`/lecturer/edit/${row.getValue("id")}`)
                 }
               >
-                Edit
+                Ubah
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={(e) => {
@@ -205,19 +214,32 @@ const LecturerTable = () => {
                   setOpenDeleteModal(true);
                 }}
               >
-                Delete
+                Hapus
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       ),
+      alias: "Aksi",
     },
   ];
+
+  const columnFilter = useMemo(() => {
+    if (columns.length) {
+      return columns.reduce((acc, col) => {
+        acc[col.accessorKey] = col.alias;
+        return acc;
+      }, {});
+    }
+
+    return {};
+  }, [columns.length]);
 
   return (
     <>
       <DataTable
         columns={columns}
+        columnFilter={columnFilter}
         data={lecturers?.data || []}
         filterComponent={() => (
           <Input
