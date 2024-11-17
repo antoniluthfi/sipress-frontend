@@ -30,4 +30,6 @@ const SelectLocationInput = forwardRef(
   }
 );
 
+SelectLocationInput.displayName = "SelectLocationInput";
+
 export default SelectLocationInput;

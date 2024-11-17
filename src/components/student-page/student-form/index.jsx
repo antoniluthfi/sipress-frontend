@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Nama harus diisi" }),
@@ -230,7 +231,13 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
         {imagePreview && (
           <div className="lg:col-span-2">
             <FormLabel>Preview Foto Profil</FormLabel>
-            <img src={imagePreview} alt="Preview" className="max-w-sm h-auto" />
+            <Image
+              src={imagePreview}
+              alt="Preview Foto Profil"
+              width={300} // Ganti sesuai kebutuhan
+              height={200} // Ganti sesuai kebutuhan
+              className="max-w-sm h-auto"
+            />
           </div>
         )}
 

@@ -30,4 +30,6 @@ const SelectLecturerInput = forwardRef(
   }
 );
 
+SelectLecturerInput.displayName = "SelectLecturerInput";
+
 export default SelectLecturerInput;

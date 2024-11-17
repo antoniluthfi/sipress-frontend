@@ -85,6 +85,13 @@ const CoursePage = () => {
                               Ubah
                             </DropdownMenuItem>
                             <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`/course/manage-students/${course?.id}`)
+                              }
+                            >
+                              Atur Mahasiswa
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
                               onSelect={(e) => {
                                 setSelectedId(course?.id);
                                 setOpenDeleteModal(true);
