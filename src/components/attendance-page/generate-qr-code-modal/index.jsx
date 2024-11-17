@@ -8,12 +8,12 @@ import { useQRCode } from "next-qrcode";
 const GenerateQrCodeModal = ({
   isModalOpen,
   closeModal,
-  courseId,
+  courseMeetingId,
   courseName,
 }) => {
   const { Canvas } = useQRCode();
   const { data, isLoading } = useGenerateQrCode({
-    courseMeetingId: courseId,
+    courseMeetingId,
     enable: isModalOpen,
   });
 
@@ -28,9 +28,9 @@ const GenerateQrCodeModal = ({
         <p className="text-base text-center">{courseName}</p>
       </div>
 
-      {isLoading ? (
-        <LoadingSpinner isLoading={isLoading} />
-      ) : (
+      {isLoading && !data && <LoadingSpinner isLoading={isLoading} />}
+
+      {!isLoading && !!data && (
         <Canvas
           text={data?.qr_code || "-"}
           options={{
@@ -41,6 +41,10 @@ const GenerateQrCodeModal = ({
           }}
           className="w-full max-w-[800px]"
         />
+      )}
+
+      {!isLoading && !data && (
+        <p className="font-bold text-center">Tidak dapat membuat kode QR</p>
       )}
     </Modal>
   );

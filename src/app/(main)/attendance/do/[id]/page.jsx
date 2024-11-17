@@ -39,7 +39,6 @@ const DoAttendancePage = () => {
 
           <DoAttendanceTable
             data={data?.meetings}
-            courseId={data?.id}
             courseName={data?.name}
           />
         </CardContent>
