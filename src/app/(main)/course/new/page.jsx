@@ -47,17 +47,17 @@ const AddNewCoursePage = () => {
   };
 
   return (
-    <div className="h-auto w-full flex flex-1 flex-col gap-10">
+    <div className="h-auto w-full flex flex-1 flex-col gap-5 lg:gap-10">
       <div className="flex items-center gap-3">
         <button onClick={() => router.push("/course")}>
           <ArrowLeftIcon />
         </button>
-        <h3 className="text-3xl text-[#253763] font-semibold">
+        <h3 className="text-xl lg:text-3xl text-[#253763] font-semibold">
           Tambah Mata Kuliah
         </h3>
       </div>
       <Card className="w-full">
-        <CardContent className="flex flex-col p-5 gap-5">
+        <CardContent className="flex flex-col p-2 lg:p-5 gap-2 lg:gap-5">
           <CourseForm
             defaultValues={{
               name: "",

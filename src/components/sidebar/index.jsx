@@ -75,7 +75,7 @@ const Sidebar = () => {
   return (
     <div
       className={`h-screen bg-[#253763] text-white flex flex-col transform ${
-        isOpen ? "w-[358px]" : "w-20"
+        isOpen ? "w-[275px] lg:w-[358px]" : "w-20"
       } transition-all duration-300 ease-in-out`}
     >
       <div className="py-9 font-bold text-lg border-b border-gray-700">
@@ -92,7 +92,7 @@ const Sidebar = () => {
                 <button
                   key={data.title}
                   type="button"
-                  className="flex items-center gap-7 py-[30px] px-20 hover:bg-white hover:text-[#253763] text-xl font-semibold whitespace-nowrap"
+                  className="flex items-center gap-7 py-[15px] lg:py-[30px] px-10 lg:px-20 hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold whitespace-nowrap"
                   onClick={logout}
                 >
                   {data.icon}
@@ -105,7 +105,7 @@ const Sidebar = () => {
               <Link
                 key={data.title}
                 href={data.href}
-                className="flex items-center gap-7 py-[30px] px-20 hover:bg-white hover:text-[#253763] text-xl font-semibold whitespace-nowrap"
+                className="flex items-center gap-7 py-[15px] lg:py-[30px] px-10 lg:px-20 hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold whitespace-nowrap"
               >
                 {data.icon}
                 {data.title}
@@ -122,7 +122,7 @@ const Sidebar = () => {
                   <button
                     key={data.title}
                     type="button"
-                    className="flex items-center justify-center py-[30px] hover:bg-white hover:text-[#253763] text-xl font-semibold"
+                    className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
                     onClick={logout}
                   >
                     {data.icon}
@@ -131,7 +131,7 @@ const Sidebar = () => {
                   <Link
                     key={data.title}
                     href={data.href}
-                    className="flex items-center justify-center py-[30px] hover:bg-white hover:text-[#253763] text-xl font-semibold"
+                    className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
                   >
                     {data.icon}
                   </Link>

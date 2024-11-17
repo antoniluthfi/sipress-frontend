@@ -22,8 +22,8 @@ export default function MainLayout({ children }) {
         <Sidebar />
         <div className="flex flex-col flex-1 h-full overflow-hidden bg-[#F3F3F3]">
           <Header />
-          <div className="flex-1 overflow-auto px-9 py-6">{children}</div>
-          <footer className="bg-white text-[#253763] text-center py-4">
+          <div className="flex-1 overflow-auto px-4 lg:px-9 py-3 lg:py-6">{children}</div>
+          <footer className="bg-white text-[#253763] text-sm lg:text-base text-center py-2 lg:py-4">
             © 2024 Anggi Company. All rights reserved.
           </footer>
         </div>

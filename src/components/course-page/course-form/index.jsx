@@ -78,7 +78,7 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
         onSubmit={isViewMode ? undefined : form.handleSubmit(onSubmit)}
         className="w-full space-y-6 flex flex-col items-end"
       >
-        <div className="w-full grid grid-cols-2 gap-5 items-center">
+        <div className="w-full grid grid-flow-row lg:grid-cols-2 gap-5 items-center">
           {/* Input Fields */}
           <FormField
             control={form.control}
@@ -184,7 +184,7 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="w-full grid grid-cols-5 gap-5 items-center py-5 border-b-2 border-secondary"
+              className="w-full grid grid-flow-row lg:grid-cols-5 gap-5 items-center py-5 border-b-2 border-secondary"
             >
               <FormLabel>Pertemuan ke-{index + 1}</FormLabel>
               <FormField

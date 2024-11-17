@@ -7,7 +7,7 @@ const Search = React.forwardRef(
     return (
       <div
         className={cn(
-          "flex h-[50px] items-center rounded-md border border-input bg-[#F3F3F3] p-3 text-sm ring-offset-background",
+          "flex h-10 lg:h-[50px] items-center rounded-md border border-input bg-[#F3F3F3] p-3 text-sm ring-offset-background",
           className,
         )}
       >
