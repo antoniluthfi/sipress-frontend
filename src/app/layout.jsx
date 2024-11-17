@@ -1,7 +1,9 @@
 import { Poppins } from "next/font/google";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
+import "./globals.css";
 
 const font = Poppins({
   subsets: ["latin"],
@@ -19,6 +21,7 @@ export default function RootLayout({ children }) {
       <body className={font.className}>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );
