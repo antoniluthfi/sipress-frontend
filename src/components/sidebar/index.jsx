@@ -7,6 +7,7 @@ import {
   BookUserIcon,
   LayoutDashboardIcon,
   LogOutIcon,
+  MapPinIcon,
   NotebookPenIcon,
   UserIcon,
 } from "lucide-react";
@@ -40,6 +41,11 @@ const Sidebar = () => {
       href: PATH_NAME.LECTURER,
       icon: <BookUserIcon />,
       title: "Dosen",
+    },
+    {
+      href: PATH_NAME.LOCATION,
+      icon: <MapPinIcon />,
+      title: "Ruangan",
     },
     {
       href: PATH_NAME.ATTENDANCE,

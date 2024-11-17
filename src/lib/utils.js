@@ -15,6 +15,8 @@ export const PATH_NAME = {
   STUDENT_NEW: "/student/new",
   LECTURER: "/lecturer",
   LECTURER_NEW: "/lecturer/new",
+  LOCATION: "/location",
+  LOCATION_NEW: "/location/new",
   ATTENDANCE: "/attendance",
 };
 
@@ -25,6 +27,10 @@ export const PROTECTED_ROUTES = [
   PATH_NAME.COURSE,
   PATH_NAME.COURSE_NEW,
   PATH_NAME.STUDENT,
+  PATH_NAME.STUDENT_NEW,
   PATH_NAME.LECTURER,
+  PATH_NAME.LECTURER_NEW,
+  PATH_NAME.LOCATION,
+  PATH_NAME.LOCATION_NEW,
   PATH_NAME.ATTENDANCE,
 ];
