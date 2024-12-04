@@ -10,15 +10,18 @@ import {
   MapPinIcon,
   NotebookPenIcon,
   UserIcon,
+  X,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/useAuthStore";
-import { PATH_NAME } from "@/lib/utils";
+import { cn, PATH_NAME } from "@/lib/utils";
+import useResponsiveView from "@/lib/hooks/useResponsiveView";
 
 const Sidebar = () => {
   const router = useRouter();
-  const { isOpen } = useSidebar();
+  const viewType = useResponsiveView();
+  const { isOpen, toggleSidebar } = useSidebar();
   const { removeUser } = useAuthStore();
 
   const MENU = [
@@ -75,14 +78,25 @@ const Sidebar = () => {
   return (
     <div
       className={`h-screen bg-[#253763] text-white flex flex-col transform ${
-        isOpen ? "w-[275px] lg:w-[358px]" : "w-20"
+        isOpen ? "w-full lg:w-[358px]" : "w-20"
       } transition-all duration-300 ease-in-out`}
     >
-      <div className="py-9 font-bold text-lg border-b border-gray-700">
-        <div className="flex items-center justify-center gap-3 w-full">
-          <Image src="/images/ic_logo.png" width={48} height={40} alt="logo" priority />
+      <div className={cn("flex items-center gap-4 px-[15px] lg:px-0 py-4 lg:lg:py-9 font-bold text-lg border-b border-gray-700", viewType === "mobile" && isOpen ? "justify-between" : "justify-center")}>
+        <div className="flex items-center justify-center gap-3">
+          <Image
+            src="/images/ic_logo.png"
+            width={48}
+            height={40}
+            alt="logo"
+            priority
+          />
           {isOpen && <h3 className="text-white text-3xl font-bold">SiPress</h3>}
         </div>
+        {viewType === "mobile" && isOpen && (
+          <button onClick={toggleSidebar}>
+            <X />
+          </button>
+        )}
       </div>
       {isOpen ? (
         <nav className="flex flex-col flex-1">

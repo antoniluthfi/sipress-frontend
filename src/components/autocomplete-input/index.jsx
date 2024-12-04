@@ -2,7 +2,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef, memo } from "react";
 
 const AutocompleteInput = forwardRef(
   ({ inputClassName, suggestions, suggestionClassName, onSelectOption, defaultQuery, ...props }, ref) => {
@@ -115,6 +115,7 @@ const AutocompleteInput = forwardRef(
             inputClassName
           )}
           onChange={handleInputChange}
+          autoComplete="off"
         />
         {showDropdown && filteredSuggestions.length > 0 && (
           <ul className="absolute left-0 w-full mt-2 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
@@ -142,4 +143,4 @@ const AutocompleteInput = forwardRef(
 
 AutocompleteInput.displayName = "AutocompleteInput";
 
-export default AutocompleteInput;
+export default memo(AutocompleteInput);

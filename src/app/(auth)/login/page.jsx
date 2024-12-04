@@ -17,6 +17,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { useToast } from "@/components/ui/use-toast";
 
 const FormSchema = z.object({
   email: z
@@ -33,11 +34,12 @@ const LoginPage = () => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: "antoni@gmail.com",
+      email: "dosen1@gmail.com",
       password: "12345678",
     },
   });
 
+  const { toast } = useToast();
   useAuthenticateUser();
 
   const onSubmit = async (data) => {
@@ -49,7 +51,7 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, scope: "portal" }),
         credentials: "include",
       });
 
@@ -57,10 +59,19 @@ const LoginPage = () => {
         router.push("/dashboard");
       } else {
         const errorData = await res.json();
-        console.log(errorData.message || "Login failed");
+        toast({
+          title: "Failed",
+          description:
+            errorData?.error || errorData?.errors?.[0]?.msg || "Login Failed",
+          variant: "danger",
+        });
       }
     } catch (err) {
-      console.log("An error occurred");
+      toast({
+        title: "Failed",
+        description: err?.message || "Internal Server Error",
+        variant: "danger",
+      });
     }
   };
 

@@ -25,7 +25,7 @@ const Header = () => {
             {user?.name || "-"}
           </h3>
           <p className="text-sm text-[#B5B5B5]">
-            {user?.role === "lecturer" ? "Dosen" : "Mahasiswa"}
+            {user?.role === "lecturer" ? "Dosen" : "Admin"}
           </p>
         </div>
         <UserCircleIcon className="w-12 h-12" />
