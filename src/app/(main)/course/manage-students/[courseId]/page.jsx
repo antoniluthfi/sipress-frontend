@@ -14,10 +14,11 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { useUserCoursesList } from "@/lib/api/useUserCoursesList";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeftIcon, X } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -41,8 +42,13 @@ const ManageStudentsPage = () => {
       student_id: "",
     },
   });
+  const { data } = useUserCoursesList({
+    limit: 100,
+    course_id: Number(params?.courseId),
+  });
 
   const [selectedStudents, setSelectedStudents] = useState([]);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
 
   const handleAddStudent = (student) => {
     if (!student) return; // Pastikan student valid
@@ -61,27 +67,72 @@ const ManageStudentsPage = () => {
     setSelectedStudents(updatedStudents);
   };
 
-  const onSubmit = (data) => {
-    const studentsPayload = selectedStudents?.map((student) => ({
-      user_id: student?.id,
-      course_id: params?.courseId,
-    }));
+  useEffect(() => {
+    if (data?.length) {
+      setIsUpdateMode(true);
+      const selectedLecturer = data?.find((user) => user?.role === "lecturer");
+      form.setValue("lecturer_id", selectedLecturer?.user_id || "");
 
-    const lecturerPayload = {
-      user_id: data.lecturer_id,
-      course_id: params?.courseId,
-    };
+      const newStudents = data?.map((user) => ({
+        id: user?.user_id,
+        course_id: user?.course_id,
+        name: user?.user_name,
+      }));
+      setSelectedStudents(newStudents);
+    }
+  }, [data?.length]);
 
-    toast({
-      title: "Mahasiswa yang dipilih",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">
-            {JSON.stringify([...studentsPayload, lecturerPayload], null, 2)}
-          </code>
-        </pre>
-      ),
-    });
+  const onSubmit = async (data) => {
+    try {
+      const studentsPayload = selectedStudents?.map((student) => ({
+        user_id: student?.id,
+        course_id: Number(params?.courseId),
+      }));
+
+      const lecturerPayload = {
+        user_id: data.lecturer_id,
+        course_id: Number(params?.courseId),
+      };
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user-course`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify([...studentsPayload, lecturerPayload]),
+          credentials: "include",
+        }
+      );
+
+      if (res.ok) {
+        const response = await res.json();
+        toast({
+          title: "Success",
+          description: response?.message || "Data created successfully",
+          variant: "success",
+        });
+        router.back();
+      } else {
+        const errorData = await res.json();
+        toast({
+          title: "Failed",
+          description:
+            errorData?.error ||
+            errorData?.errors?.[0]?.msg ||
+            "Something went wrong",
+          variant: "danger",
+        });
+      }
+    } catch (err) {
+      console.error("An error occurred:", err);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again later.",
+        variant: "danger",
+      });
+    }
   };
 
   return (
@@ -113,7 +164,7 @@ const ManageStudentsPage = () => {
                           ref={field.ref}
                           value={field.value}
                           onSelectOption={(val) => {
-                            form.setValue("lecturer_id", val);
+                            form.setValue("lecturer_id", Number(val));
                           }}
                         />
                       </FormControl>
@@ -133,7 +184,7 @@ const ManageStudentsPage = () => {
                           ref={field.ref}
                           value={field.value}
                           onSelectOption={(val) => {
-                            form.setValue("student_id", val?.id);
+                            form.setValue("student_id", Number(val?.id));
                             handleAddStudent(val);
                           }}
                         />
