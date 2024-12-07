@@ -8,6 +8,7 @@ export const useCourseList = ({
   limit = 5,
   search = "",
   lecturer_id = "",
+  include_upcoming_schedule = 0,
 }) => {
   const fetcher = async (url) => {
     const res = await fetch(url, {
@@ -30,14 +31,14 @@ export const useCourseList = ({
   };
 
   const apiUrl = useMemo(() => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/course?page=${page}&limit=${limit}&search=${search}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/course?page=${page}&limit=${limit}&search=${search}&include_upcoming_schedule=${include_upcoming_schedule}`;
 
     if (lecturer_id) {
       return `${url}&lecturer_id=${lecturer_id}`;
     }
 
     return url;
-  }, [page, limit, search, lecturer_id]);
+  }, [page, limit, search, lecturer_id, include_upcoming_schedule]);
 
   const { data, error, isLoading, mutate } = useSWR(apiUrl, fetcher);
 

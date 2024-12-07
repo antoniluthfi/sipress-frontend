@@ -23,6 +23,8 @@ import CustomPagination from "@/components/custom-pagination";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { PATH_NAME } from "@/lib/utils";
 import useAuthStore from "@/store/useAuthStore";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 const CoursePage = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.COURSE });
@@ -39,7 +41,43 @@ const CoursePage = () => {
     page: currentPage,
     search: debounceSearch,
     lecturer_id: user?.role === "lecturer" ? user?.id : "",
+    include_upcoming_schedule: 1,
   });
+
+  const renderUpcomingSchedule = (course) => {
+    if (!!course?.upcoming_schedule) {
+      const date = new Date(course?.upcoming_schedule?.date);
+      const formattedDate = format(date, "eeee, dd MMMM yyyy", { locale: id });
+
+      return (
+        <>
+          <div className="flex items-center justify-between px-2 py-1 bg-[#253763] gap-3 rounded-md w-fit">
+            <p className="text-sm lg:text-base text-white">
+              {formattedDate}{" "}
+              {course?.upcoming_schedule?.start_time?.substring(0, 5)} WIB
+            </p>
+            <Clock className="text-white" />
+          </div>
+
+          <div className="flex items-center justify-between px-2 py-1 bg-red-500 gap-3 rounded-md w-fit">
+            <p className="text-sm lg:text-base text-white">
+              {formattedDate}{" "}
+              {course?.upcoming_schedule?.end_time?.substring(0, 5)} WIB
+            </p>
+            <Clock className="text-white" />
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <div className="flex items-center justify-between px-2 py-1 bg-[#253763] rounded-md w-fit">
+        <p className="text-sm lg:text-base text-white">
+          Tidak ada jadwal yang akan datang
+        </p>
+      </div>
+    );
+  };
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-5 lg:gap-10">
@@ -127,19 +165,7 @@ const CoursePage = () => {
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between px-2 py-1 bg-[#253763] rounded-md w-[130px]">
-                        <p className="text-sm lg:text-base text-white">
-                          09:30 WIB
-                        </p>
-                        <Clock className="text-white" />
-                      </div>
-
-                      <div className="flex items-center justify-between px-2 py-1 bg-red-500 rounded-md w-[130px]">
-                        <p className="text-sm lg:text-base text-white">
-                          09:30 WIB
-                        </p>
-                        <Clock className="text-white" />
-                      </div>
+                      {renderUpcomingSchedule(course)}
                     </div>
                   </CardContent>
                 </Card>
