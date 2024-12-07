@@ -22,10 +22,12 @@ import LoadingSpinner from "@/components/loading-spinner";
 import CustomPagination from "@/components/custom-pagination";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { PATH_NAME } from "@/lib/utils";
+import useAuthStore from "@/store/useAuthStore";
 
 const CoursePage = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.COURSE });
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -33,11 +35,17 @@ const CoursePage = () => {
   const [selectedId, setSelectedId] = useState("");
 
   const debounceSearch = useDebounce(searchKeyword, 500);
-  const courses = useCourseList({ page: currentPage, search: debounceSearch });
+  const courses = useCourseList({
+    page: currentPage,
+    search: debounceSearch,
+    lecturer_id: user?.role === "lecturer" ? user?.id : "",
+  });
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-5 lg:gap-10">
-      <h3 className="text-xl lg:text-3xl text-[#253763] font-semibold">Mata Kuliah</h3>
+      <h3 className="text-xl lg:text-3xl text-[#253763] font-semibold">
+        Mata Kuliah
+      </h3>
 
       <div className="flex flex-col-reverse lg:flex-row items-start justify-between gap-3 lg:gap-10">
         <div className="w-full lg:w-[60%] h-full overflow-hidden">
@@ -77,30 +85,34 @@ const CoursePage = () => {
                             >
                               Lihat Detail
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                router.push(`/course/edit/${course?.id}`)
-                              }
-                            >
-                              Ubah
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                router.push(
-                                  `/course/manage-students/${course?.id}`
-                                )
-                              }
-                            >
-                              Atur Mahasiswa
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onSelect={(e) => {
-                                setSelectedId(course?.id);
-                                setOpenDeleteModal(true);
-                              }}
-                            >
-                              Hapus
-                            </DropdownMenuItem>
+                            {user?.role === "admin" && (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(`/course/edit/${course?.id}`)
+                                  }
+                                >
+                                  Ubah
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    router.push(
+                                      `/course/manage-students/${course?.id}`
+                                    )
+                                  }
+                                >
+                                  Atur Mahasiswa
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onSelect={(e) => {
+                                    setSelectedId(course?.id);
+                                    setOpenDeleteModal(true);
+                                  }}
+                                >
+                                  Hapus
+                                </DropdownMenuItem>
+                              </>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>

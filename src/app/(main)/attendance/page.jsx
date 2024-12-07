@@ -13,17 +13,22 @@ import useDebounce from "@/lib/hooks/useDebounce";
 import { useCourseList } from "@/lib/api/useCourseList";
 import LoadingSpinner from "@/components/loading-spinner";
 import CustomPagination from "@/components/custom-pagination";
+import useAuthStore from "@/store/useAuthStore";
 
 const AttendancePage = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.ATTENDANCE });
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
 
   const debounceSearch = useDebounce(searchKeyword, 500);
-  const courses = useCourseList({ page: currentPage, search: debounceSearch });
+  const courses = useCourseList({
+    page: currentPage,
+    search: debounceSearch,
+    lecturer_id: user?.role === "lecturer" ? user?.id : "",
+  });
 
   return (
     <div className="h-auto w-full flex flex-1 flex-col gap-10">
@@ -101,7 +106,10 @@ const AttendancePage = () => {
             <CardTitle className="text-xl border-b-[1px] border-[#253763]">
               Cari Mata Kuliah
             </CardTitle>
-            <Search placeholder="Cari data" />
+            <Search
+              placeholder="Cari data"
+              onChange={(e) => setSearchKeyword(e.target.value)}
+            />
           </CardContent>
         </Card>
       </div>
