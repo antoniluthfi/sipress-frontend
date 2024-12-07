@@ -1,6 +1,5 @@
 "use client";
 
-import SelectLecturerInput from "@/components/course-page/select-lecturer-input";
 import SelectStudentInput from "@/components/course-page/select-student-input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,8 +22,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  lecturer_id: z.number().min(1, { message: "Dosen harus diisi." }),
-  student_id: z.number().min(1, { message: "Mahasiswa harus diisi." }),
+  student_id: z
+    .number()
+    .min(1, { message: "Mahasiswa harus diisi." })
+    .optional(),
+  selectedStudents: z
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+      })
+    )
+    .optional(),
 });
 
 const ManageStudentsPage = () => {
@@ -35,64 +44,66 @@ const ManageStudentsPage = () => {
   const params = useParams();
   const { toast } = useToast();
 
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      lecturer_id: "",
-      student_id: "",
+      student_id: undefined,
+      selectedStudents: [],
     },
   });
+
   const { data } = useUserCoursesList({
     limit: 100,
     course_id: Number(params?.courseId),
   });
 
-  const [selectedStudents, setSelectedStudents] = useState([]);
-  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  // Gunakan watch untuk memantau selectedStudents
+  const selectedStudents = form.watch("selectedStudents") || [];
+
+  useEffect(() => {
+    if (data?.length) {
+      const newStudents = data.map((user) => ({
+        id: user.user_id,
+        name: user.user_name,
+      }));
+      console.log("Fetched students:", newStudents);
+      form.setValue("selectedStudents", newStudents);
+
+      setIsUpdateMode(true);
+    }
+  }, [data, form]);
 
   const handleAddStudent = (student) => {
-    if (!student) return; // Pastikan student valid
+    const selectedStudents = form.getValues("selectedStudents") || [];
+    if (!student) return;
+
     const isStudentExist = selectedStudents.some(
-      (selected) => selected?.id === student?.id
+      (selected) => selected.id === student.id
     );
+
     if (!isStudentExist) {
-      setSelectedStudents((prevStudents) => [...prevStudents, student]);
+      const updatedStudents = [...selectedStudents, student];
+      console.log("Added student:", updatedStudents);
+      form.setValue("selectedStudents", updatedStudents);
     }
   };
 
   const handleRemoveStudent = (studentId) => {
-    const updatedStudents = selectedStudents.filter(
-      (student) => student?.id !== studentId
-    );
-    setSelectedStudents(updatedStudents);
+    const updatedStudents = form
+      .getValues("selectedStudents")
+      ?.filter((student) => student.id !== studentId);
+    console.log("Removed student, updated list:", updatedStudents);
+    form.setValue("selectedStudents", updatedStudents);
   };
 
-  useEffect(() => {
-    if (data?.length) {
-      setIsUpdateMode(true);
-      const selectedLecturer = data?.find((user) => user?.role === "lecturer");
-      form.setValue("lecturer_id", selectedLecturer?.user_id || "");
-
-      const newStudents = data?.map((user) => ({
-        id: user?.user_id,
-        course_id: user?.course_id,
-        name: user?.user_name,
-      }));
-      setSelectedStudents(newStudents);
-    }
-  }, [data?.length]);
-
-  const onSubmit = async (data) => {
+  const onAddData = async (values) => {
     try {
-      const studentsPayload = selectedStudents?.map((student) => ({
-        user_id: student?.id,
+      const studentsPayload = values.selectedStudents?.map((student) => ({
+        user_id: student.id,
         course_id: Number(params?.courseId),
       }));
-
-      const lecturerPayload = {
-        user_id: data.lecturer_id,
-        course_id: Number(params?.courseId),
-      };
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/user-course`,
@@ -101,7 +112,55 @@ const ManageStudentsPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify([...studentsPayload, lecturerPayload]),
+          body: JSON.stringify(studentsPayload),
+          credentials: "include",
+        }
+      );
+
+      if (res.ok) {
+        const response = await res.json();
+        toast({
+          title: "Success",
+          description: response?.message || "Data created successfully",
+          variant: "success",
+        });
+        router.back();
+      } else {
+        const errorData = await res.json();
+        toast({
+          title: "Failed",
+          description:
+            errorData?.error ||
+            errorData?.errors?.[0]?.msg ||
+            "Something went wrong",
+          variant: "danger",
+        });
+      }
+    } catch (err) {
+      console.error("An error occurred:", err);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again later.",
+        variant: "danger",
+      });
+    }
+  };
+
+  const onUpdateData = async (values) => {
+    try {
+      const studentsPayload = values.selectedStudents?.map((student) => ({
+        user_id: student.id,
+        course_id: Number(params?.courseId),
+      }));
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user-course/${params?.courseId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(studentsPayload),
           credentials: "include",
         }
       );
@@ -149,30 +208,12 @@ const ManageStudentsPage = () => {
         <CardContent className="flex flex-col p-2 lg:p-5 gap-2 lg:gap-5">
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(
+                isUpdateMode ? onUpdateData : onAddData
+              )}
               className="w-full space-y-6 flex flex-col items-end"
             >
               <div className="w-full grid grid-flow-row lg:grid-cols-2 gap-5 items-center">
-                <FormField
-                  control={form.control}
-                  name="lecturer_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Dosen</FormLabel>
-                      <FormControl>
-                        <SelectLecturerInput
-                          ref={field.ref}
-                          value={field.value}
-                          onSelectOption={(val) => {
-                            form.setValue("lecturer_id", Number(val));
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="student_id"
@@ -184,7 +225,7 @@ const ManageStudentsPage = () => {
                           ref={field.ref}
                           value={field.value}
                           onSelectOption={(val) => {
-                            form.setValue("student_id", Number(val?.id));
+                            form.setValue("student_id", Number(val.id));
                             handleAddStudent(val);
                           }}
                         />
@@ -195,20 +236,19 @@ const ManageStudentsPage = () => {
                 />
               </div>
 
-              {/* Daftar mahasiswa yang telah dipilih */}
               <div className="w-full space-y-2">
                 <h4 className="text-lg font-medium">Peserta Mata Kuliah:</h4>
                 <ul className="flex items-center gap-3 w-full">
-                  {selectedStudents?.map((student) => (
+                  {selectedStudents.map((student) => (
                     <li
-                      key={student?.id}
+                      key={student.id}
                       className="flex justify-between items-center gap-2 border-[1px] rounded-md w-fit"
                     >
-                      <p className="ml-4">{student?.name}</p>
+                      <p className="ml-4">{student.name}</p>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleRemoveStudent(student?.id)}
+                        onClick={() => handleRemoveStudent(student.id)}
                       >
                         <X />
                       </Button>

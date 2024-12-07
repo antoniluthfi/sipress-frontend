@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 export const useUserList = ({
   page = 1,
@@ -9,40 +8,36 @@ export const useUserList = ({
   search = "",
   role = "",
 }) => {
-  const [data, setData] = useState(null);
-  const [pagination, setPagination] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fetcher = async (url) => {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user?page=${page}&limit=${limit}&search=${search}&role=${role}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (res.ok) {
-        const resJson = await res.json();
-        setData(resJson?.data || null);
-        setPagination(resJson?.pagination || null);
-      }
-    } catch (error) {
-      console.log("error useUserList: ", error);
-    } finally {
-      setIsLoading(false);
+    if (!res.ok) {
+      throw new Error("Failed to fetch user list");
     }
+
+    const resJson = await res.json();
+    return {
+      data: resJson?.data || null,
+      pagination: resJson?.pagination || null,
+    };
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [page, limit, search]);
+  const { data, error, isLoading, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/user?page=${page}&limit=${limit}&search=${search}&role=${role}`,
+    fetcher
+  );
 
-  return { data, pagination, isLoading, refetch: fetchData };
+  return {
+    data: data?.data || null,
+    pagination: data?.pagination || null,
+    isLoading,
+    isError: !!error,
+    refetch: mutate, // Menggunakan `mutate` untuk memuat ulang data
+  };
 };

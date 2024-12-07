@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import useAuthStore from "@/store/useAuthStore";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import useSWR from "swr";
 import { PATH_NAME } from "../utils";
 
 export const useAuthenticateUser = (route) => {
@@ -11,50 +10,44 @@ export const useAuthenticateUser = (route) => {
   const router = useRouter();
   const { saveUser, removeUser } = useAuthStore();
 
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fetcher = async (url) => {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/authenticated-user`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch authenticated user");
-      }
-
-      const resJson = await res.json();
-      setData(resJson?.data || null);
-      saveUser(resJson?.data);
-      router.push(route?.authenticatedRedirectRoute || PATH_NAME.DASHBOARD);
-    } catch (error) {
-      console.error("Authentication failed:", error);
-      removeUser();
-      router.push(route?.redirectRoute || PATH_NAME.LOGIN);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [route]);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    if (pathName && isMounted) {
-      fetchData();
+    if (!res.ok) {
+      throw new Error("Failed to fetch authenticated user");
     }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [pathName]);
+    const resJson = await res.json();
+    saveUser(resJson?.data); // Simpan user ke store
+    return resJson?.data;
+  };
 
-  return { data, isLoading };
+  const { data, error, isLoading, mutate } = useSWR(
+    pathName
+      ? `${process.env.NEXT_PUBLIC_API_URL}/auth/authenticated-user`
+      : null, // Hanya fetch jika pathName ada
+    fetcher,
+    {
+      onError: () => {
+        removeUser(); // Hapus user jika terjadi error
+        router.push(route?.redirectRoute || PATH_NAME.LOGIN);
+      },
+      onSuccess: () => {
+        router.push(route?.authenticatedRedirectRoute || PATH_NAME.DASHBOARD);
+      },
+    }
+  );
+
+  return {
+    data,
+    isLoading,
+    isError: !!error,
+    refetch: mutate, // SWR menyediakan `mutate` untuk refresh data
+  };
 };

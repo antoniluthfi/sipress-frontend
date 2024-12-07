@@ -1,43 +1,34 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 export const useCourseDetails = (id) => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fetcher = async (url) => {
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/course/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      if (res.ok) {
-        const resJson = await res.json();
-        setData(resJson?.data || null);
-      }
-    } catch (error) {
-      console.log("error useCourseDetails: ", error);
-    } finally {
-      setIsLoading(false);
+    if (!res.ok) {
+      throw new Error("Failed to fetch course details");
     }
+
+    const resJson = await res.json();
+    return resJson?.data;
   };
 
-  useEffect(() => {
-    if (id) {
-      fetchData();
-    }
-  }, [id]);
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? `${process.env.NEXT_PUBLIC_API_URL}/course/${id}` : null, // Hanya fetch jika ID tersedia
+    fetcher
+  );
 
-  return { data, isLoading };
+  return {
+    data,
+    isLoading,
+    isError: !!error,
+    refetch: mutate, // `mutate` dapat digunakan untuk refresh data
+  };
 };

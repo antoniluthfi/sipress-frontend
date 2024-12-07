@@ -1,92 +1,82 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import useSWR from "swr";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export const useGenerateQrCode = ({ courseMeetingId, enable = false }) => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-
   const { toast } = useToast();
 
-  const generateQrCode = async () => {
-    try {
-      setIsLoading(true);
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/qr-code/generate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ course_meeting_id: courseMeetingId }),
-          credentials: "include",
-        }
-      );
-
-      if (!res.ok) {
-        throw new Error("Failed to generate QR code");
+  // Fetcher untuk generate QR Code
+  const generateQrCodeFetcher = async () => {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/qr-code/generate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ course_meeting_id: courseMeetingId }),
+        credentials: "include",
       }
+    );
 
-      const resJson = await res.json();
-      setData(resJson?.data || null);
-    } catch (error) {
-      console.log("error generateQrCode: ", error);
-      toast({
-        title: "Failed",
-        description: error.message,
-        variant: "danger",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    if (!res.ok) throw new Error("Failed to generate QR code");
+
+    return await res.json();
   };
 
+  // Hook SWR untuk generate QR Code
+  const { data, error, isLoading, mutate } = useSWR(
+    enable && courseMeetingId
+      ? `${process.env.NEXT_PUBLIC_API_URL}/qr-code/generate-${courseMeetingId}`
+      : null,
+    generateQrCodeFetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      revalidateOnReconnect: false,
+    }
+  );
+
+  // Refresh QR Code
   const refreshQrCode = async () => {
     try {
-      setIsLoading(true);
-
-      console.log(data);
-      if (!data?.id) throw new Error("QR code data is missing");
+      if (!data?.data?.id) throw new Error("QR code data is missing");
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/qr-code/refresh/${data.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/qr-code/refresh/${data.data.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ qr_code: data.qr_code }),
+          body: JSON.stringify({ qr_code: data.data.qr_code }),
           credentials: "include",
         }
       );
 
       if (!res.ok) throw new Error("Failed to refresh QR code");
 
-      const resJson = await res.json();
-      setData(resJson?.data || null);
+      const refreshedData = await res.json();
+      mutate({ ...data, data: refreshedData?.data });
     } catch (error) {
-      console.log("error refreshQrCode: ", error);
+      console.error("Error refreshing QR code:", error);
       toast({
         title: "Failed",
         description: error.message,
         variant: "danger",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  // Delete QR Code
   const deleteQrCode = async () => {
     try {
-      setIsLoading(true);
-
-      if (!data?.id) throw new Error("QR code data is missing");
+      if (!data?.data?.id) throw new Error("QR code data is missing");
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/qr-code/${data.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/qr-code/${data.data.id}`,
         {
           method: "DELETE",
           headers: {
@@ -98,41 +88,43 @@ export const useGenerateQrCode = ({ courseMeetingId, enable = false }) => {
 
       if (!res.ok) throw new Error("Failed to delete QR code");
 
-      const resJson = await res.json();
-      setData(resJson?.data || null);
+      mutate(null, { revalidate: false });
     } catch (error) {
-      console.log("error deleteQrCode: ", error);
+      console.error("Error deleting QR code:", error);
       toast({
         title: "Failed",
         description: error.message,
         variant: "danger",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
+  // Interval untuk refresh QR code
   useEffect(() => {
     let interval;
 
-    if (enable && !data) {
-      generateQrCode();
-    }
-
-    if (enable && data?.id) {
+    if (enable && data?.data?.id) {
       interval = setInterval(() => {
         refreshQrCode();
       }, 50000); // 50 detik
     }
 
-    if (!enable && data?.id) {
-      deleteQrCode();
-    }
-
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [enable, data]);
+  }, [enable, data?.data?.id]);
 
-  return { data, isLoading };
+  // Delete QR code jika `enable` berubah menjadi `false`
+  useEffect(() => {
+    if (!enable && data?.data?.id) {
+      deleteQrCode();
+    }
+  }, [enable, data?.data?.id]);
+
+  return {
+    data: data?.data || null,
+    isLoading,
+    isError: !!error,
+    refetch: mutate, // Untuk revalidasi manual
+  };
 };
