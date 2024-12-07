@@ -14,6 +14,14 @@ const AddNewCoursePage = () => {
   const router = useRouter();
   const { toast } = useToast();
 
+  const meetingTotal = 16;
+  const meetings = Array.from({ length: meetingTotal }, (_, index) => ({
+    meeting_number: index + 1,
+    date: "",
+    start_time: "",
+    end_time: "",
+  }));
+
   const handleSubmit = async (data) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/course`, {
@@ -64,10 +72,8 @@ const AddNewCoursePage = () => {
               code: "",
               lecturer_id: "",
               room: "",
-              meeting_total: "1",
-              meetings: [
-                { meeting_number: 1, date: "", start_time: "", end_time: "" },
-              ],
+              meeting_total: meetingTotal.toString(),
+              meetings,
             }}
             onSubmit={handleSubmit}
           />

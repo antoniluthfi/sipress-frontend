@@ -8,6 +8,7 @@ import GenerateQrCodeModal from "../generate-qr-code-modal";
 import { format, isBefore, isAfter, addMinutes } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams, useRouter } from "next/navigation";
+import { id } from "date-fns/locale";
 
 const DoAttendanceTable = ({ data, courseName }) => {
   const router = useRouter();
@@ -83,7 +84,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
       ),
       cell: ({ row }) => {
         const date = new Date(row.getValue("date"));
-        const formattedDate = format(date, "yyyy-MM-dd");
+        const formattedDate = format(date, "eeee, dd MMMM yyyy", { locale: id });
 
         return <div className="text-center">{formattedDate}</div>;
       },
