@@ -7,8 +7,9 @@ import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { PATH_NAME } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import React from "react";
+import ProtectedPage from "@/components/protected-page";
 
-const LecturerPage = () => {
+const LecturerComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.LECTURER });
   const router = useRouter();
 
@@ -28,5 +29,13 @@ const LecturerPage = () => {
     </div>
   );
 };
+
+const LecturerPage = () => {
+  return (
+    <ProtectedPage>
+      <LecturerComponent />
+    </ProtectedPage>
+  )
+}
 
 export default LecturerPage;

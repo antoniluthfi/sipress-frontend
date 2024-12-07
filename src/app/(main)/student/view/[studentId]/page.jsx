@@ -1,6 +1,7 @@
 "use client";
 
 import LoadingSpinner from "@/components/loading-spinner";
+import ProtectedPage from "@/components/protected-page";
 import StudentForm from "@/components/student-page/student-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-const StudentDetailPage = () => {
+const StudentDetailComponent = () => {
   const pathname = usePathname();
   useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   
@@ -41,6 +42,14 @@ const StudentDetailPage = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+const StudentDetailPage = () => {
+  return (
+    <ProtectedPage>
+      <StudentDetailComponent />
+    </ProtectedPage>
   );
 };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import ProtectedPage from "@/components/protected-page";
 import StudentForm from "@/components/student-page/student-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const AddNewStudentPage = () => {
+const AddNewStudentComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.STUDENT_NEW });
   const router = useRouter();
   const { toast } = useToast();
@@ -94,6 +95,14 @@ const AddNewStudentPage = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+const AddNewStudentPage = () => {
+  return (
+    <ProtectedPage>
+      <AddNewStudentComponent />
+    </ProtectedPage>
   );
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import LocationForm from "@/components/location-page/location-form";
+import ProtectedPage from "@/components/protected-page";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const AddNewLocationPage = () => {
+const AddNewLocationComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.LOCATION_NEW });
   const router = useRouter();
   const { toast } = useToast();
@@ -78,5 +79,13 @@ const AddNewLocationPage = () => {
     </div>
   );
 };
+
+const AddNewLocationPage = () => {
+  return (
+    <ProtectedPage>
+      <AddNewLocationComponent />
+    </ProtectedPage>
+  )
+}
 
 export default AddNewLocationPage;

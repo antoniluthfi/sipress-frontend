@@ -2,6 +2,7 @@
 
 import LecturerForm from "@/components/lecturer-page/lecturer-form";
 import LoadingSpinner from "@/components/loading-spinner";
+import ProtectedPage from "@/components/protected-page";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { useUserDetails } from "@/lib/api/useUserDetails";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-const LecturerDetailPage = () => {
+const LecturerDetailComponent = () => {
   const pathname = usePathname();
   useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   const router = useRouter();
@@ -42,5 +43,13 @@ const LecturerDetailPage = () => {
     </div>
   );
 };
+
+const LecturerDetailPage = () => {
+  return (
+    <ProtectedPage>
+      <LecturerDetailComponent />
+    </ProtectedPage>
+  )
+}
 
 export default LecturerDetailPage;

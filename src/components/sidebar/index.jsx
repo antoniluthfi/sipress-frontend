@@ -22,38 +22,44 @@ const Sidebar = () => {
   const router = useRouter();
   const viewType = useResponsiveView();
   const { isOpen, toggleSidebar } = useSidebar();
-  const { removeUser } = useAuthStore();
+  const { removeUser, user } = useAuthStore();
 
   const MENU = [
     {
       href: PATH_NAME.DASHBOARD,
       icon: <LayoutDashboardIcon />,
       title: "Dashboard",
+      needAdminAccess: false,
     },
     {
       href: PATH_NAME.COURSE,
       icon: <BookIcon />,
       title: "Mata Kuliah",
+      needAdminAccess: false,
     },
     {
       href: PATH_NAME.STUDENT,
       icon: <UserIcon />,
       title: "Mahasiswa",
+      needAdminAccess: true,
     },
     {
       href: PATH_NAME.LECTURER,
       icon: <BookUserIcon />,
       title: "Dosen",
+      needAdminAccess: true,
     },
     {
       href: PATH_NAME.LOCATION,
       icon: <MapPinIcon />,
       title: "Ruangan",
+      needAdminAccess: true,
     },
     {
       href: PATH_NAME.ATTENDANCE,
       icon: <NotebookPenIcon />,
       title: "Presensi",
+      needAdminAccess: false,
     },
     {
       href: PATH_NAME.LANDING_PAGE,
@@ -81,7 +87,12 @@ const Sidebar = () => {
         isOpen ? "w-full lg:w-[358px]" : "w-20"
       } transition-all duration-300 ease-in-out`}
     >
-      <div className={cn("flex items-center gap-4 px-[15px] lg:px-0 py-4 lg:lg:py-9 font-bold text-lg border-b border-gray-700", viewType === "mobile" && isOpen ? "justify-between" : "justify-center")}>
+      <div
+        className={cn(
+          "flex items-center gap-4 px-[15px] lg:px-0 py-4 lg:lg:py-9 font-bold text-lg border-b border-gray-700",
+          viewType === "mobile" && isOpen ? "justify-between" : "justify-center"
+        )}
+      >
         <div className="flex items-center justify-center gap-3">
           <Image
             src="/images/ic_logo.png"
@@ -115,16 +126,31 @@ const Sidebar = () => {
               );
             }
 
-            return (
-              <Link
-                key={data.title}
-                href={data.href}
-                className="flex items-center gap-7 py-[15px] lg:py-[30px] px-10 lg:px-20 hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold whitespace-nowrap"
-              >
-                {data.icon}
-                {data.title}
-              </Link>
-            );
+            if (!data.needAdminAccess && user?.role === "lecturer") {
+              return (
+                <Link
+                  key={data.title}
+                  href={data.href}
+                  className="flex items-center gap-7 py-[15px] lg:py-[30px] px-10 lg:px-20 hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold whitespace-nowrap"
+                >
+                  {data.icon}
+                  {data.title}
+                </Link>
+              );
+            }
+
+            if (user?.role === "admin") {
+              return (
+                <Link
+                  key={data.title}
+                  href={data.href}
+                  className="flex items-center gap-7 py-[15px] lg:py-[30px] px-10 lg:px-20 hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold whitespace-nowrap"
+                >
+                  {data.icon}
+                  {data.title}
+                </Link>
+              );
+            }
           })}
         </nav>
       ) : (
@@ -132,7 +158,7 @@ const Sidebar = () => {
           {MENU.map((data) => (
             <Tooltip key={data.title} delayDuration={0}>
               <TooltipTrigger asChild>
-                {data.title === "Logout" ? (
+                {data.title === "Logout" && (
                   <button
                     key={data.title}
                     type="button"
@@ -141,7 +167,19 @@ const Sidebar = () => {
                   >
                     {data.icon}
                   </button>
-                ) : (
+                )}
+
+                {!data.needAdminAccess && user?.role === "lecturer" && (
+                  <Link
+                    key={data.title}
+                    href={data.href}
+                    className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
+                  >
+                    {data.icon}
+                  </Link>
+                )}
+
+                {user?.role === "admin" && (
                   <Link
                     key={data.title}
                     href={data.href}

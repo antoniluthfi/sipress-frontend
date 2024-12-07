@@ -1,6 +1,7 @@
 "use client";
 
 import LecturerForm from "@/components/lecturer-page/lecturer-form";
+import ProtectedPage from "@/components/protected-page";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const AddNewLecturerPage = () => {
+const AddNewLecturerComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.LECTURER_NEW });
   const router = useRouter();
   const { toast } = useToast();
@@ -96,5 +97,13 @@ const AddNewLecturerPage = () => {
     </div>
   );
 };
+
+const AddNewLecturerPage = () => {
+  return (
+    <ProtectedPage>
+      <AddNewLecturerComponent />
+    </ProtectedPage>
+  )
+}
 
 export default AddNewLecturerPage;

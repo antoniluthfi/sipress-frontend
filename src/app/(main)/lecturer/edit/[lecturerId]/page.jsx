@@ -2,6 +2,7 @@
 
 import LecturerForm from "@/components/lecturer-page/lecturer-form";
 import LoadingSpinner from "@/components/loading-spinner";
+import ProtectedPage from "@/components/protected-page";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
@@ -10,7 +11,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-const EditLecturerPage = () => {
+const EditLecturerComponent = () => {
   const pathname = usePathname();
   useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   const router = useRouter();
@@ -95,5 +96,13 @@ const EditLecturerPage = () => {
     </div>
   );
 };
+
+const EditLecturerPage = () => {
+  return (
+    <ProtectedPage>
+      <EditLecturerComponent />
+    </ProtectedPage>
+  )
+}
 
 export default EditLecturerPage;

@@ -2,6 +2,7 @@
 
 import LoadingSpinner from "@/components/loading-spinner";
 import LocationForm from "@/components/location-page/location-form";
+import ProtectedPage from "@/components/protected-page";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { useLocationDetails } from "@/lib/api/useLocationDetails";
@@ -9,7 +10,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-const LocationDetailPage = () => {
+const LocationDetailComponent = () => {
   const pathname = usePathname();
   useAuthenticateUser({ authenticatedRedirectRoute: pathname });
   
@@ -43,5 +44,13 @@ const LocationDetailPage = () => {
     </div>
   );
 };
+
+const LocationDetailPage = () => {
+  return (
+    <ProtectedPage>
+      <LocationDetailComponent />
+    </ProtectedPage>
+  )
+}
 
 export default LocationDetailPage;

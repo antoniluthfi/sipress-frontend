@@ -1,5 +1,6 @@
 "use client";
 
+import ProtectedPage from "@/components/protected-page";
 import StudentTable from "@/components/student-page/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { PATH_NAME } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const StudentPage = () => {
+const StudentComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.STUDENT });
   const router = useRouter();
 
@@ -26,6 +27,14 @@ const StudentPage = () => {
         </CardContent>
       </Card>
     </div>
+  );
+};
+
+const StudentPage = () => {
+  return (
+    <ProtectedPage>
+      <StudentComponent />
+    </ProtectedPage>
   );
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import LocationTable from "@/components/location-page/table";
+import ProtectedPage from "@/components/protected-page";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
@@ -8,7 +9,7 @@ import { PATH_NAME } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const LocationPage = () => {
+const LocationComponent = () => {
   useAuthenticateUser({ authenticatedRedirectRoute: PATH_NAME.LOCATION });
   const router = useRouter();
 
@@ -28,5 +29,13 @@ const LocationPage = () => {
     </div>
   );
 };
+
+const LocationPage = () => {
+  return (
+    <ProtectedPage>
+      <LocationComponent />
+    </ProtectedPage>
+  )
+}
 
 export default LocationPage;
