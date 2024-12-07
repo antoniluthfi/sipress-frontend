@@ -1,14 +1,8 @@
 "use client";
 
+import CustomPagination from "@/components/custom-pagination";
+import LoadingSpinner from "@/components/loading-spinner";
 import { Input } from "@/components/ui/input";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -17,48 +11,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useUserCoursesList } from "@/lib/api/useUserCoursesList";
 import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 import React, { useState } from "react";
 
 const AttendanceRecapTable = () => {
+  const params = useParams();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 10;
-  const totalItems = 30;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  const renderPaginationItems = () => {
-    let paginationItems = [];
-
-    for (let i = 1; i <= totalPages; i++) {
-      paginationItems.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            href="#"
-            isActive={i === currentPage}
-            onClick={() => handlePageChange(i)}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return paginationItems;
-  };
-
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return Array.from({ length: totalItems }, (_, i) => i).slice(
-      startIndex,
-      endIndex
-    );
-  };
+  const userCourses = useUserCoursesList({
+    page: currentPage,
+    course_id: params?.id,
+  });
 
   return (
     <div className="flex flex-col gap-5">
@@ -101,47 +66,44 @@ const AttendanceRecapTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {getCurrentPageData().map((_, dataIndex) => (
-              <TableRow key={dataIndex}>
-                <TableCell className="text-center">{dataIndex + 1}</TableCell>
-                <TableCell>Lintang Luthfiantoni</TableCell>
-                <TableCell className="text-center">8673826702</TableCell>
-                {Array.from({ length: 16 }).map((_, index) => (
-                  <TableCell
-                    key={index}
-                    className={cn(
-                      "text-center",
-                      index % 2 === 0 ? "bg-slate-100" : ""
-                    )}
-                  >
-                    H
+            {userCourses?.data?.length > 0 ? (
+              userCourses?.data?.map((data, dataIndex) => (
+                <TableRow key={dataIndex}>
+                  <TableCell className="text-center">{dataIndex + 1}</TableCell>
+                  <TableCell>{data?.user_name}</TableCell>
+                  <TableCell className="text-center">
+                    {data?.identification_number}
                   </TableCell>
-                ))}
+                  {Array.from({ length: 16 }).map((_, index) => (
+                    <TableCell
+                      key={index}
+                      className={cn(
+                        "text-center",
+                        index % 2 === 0 ? "bg-slate-100" : ""
+                      )}
+                    >
+                      H
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={19} className="py-10">
+                  <LoadingSpinner isLoading={userCourses?.isLoading} />
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <Pagination className="w-fit mx-0">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-            />
-          </PaginationItem>
-          {renderPaginationItems()}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <CustomPagination
+        show={userCourses?.data?.length > 0}
+        onPageChange={(val) => setCurrentPage(val)}
+        currentPage={currentPage}
+        totalPages={userCourses?.pagination?.totalPages || 1}
+      />
     </div>
   );
 };
