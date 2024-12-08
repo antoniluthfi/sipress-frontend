@@ -26,7 +26,7 @@ const AttendanceRecapPage = () => {
 
       <Card className="h-3/4 w-full overflow-hidden">
         <CardContent className="flex flex-col gap-5 px-5 py-10">
-          <Button className="w-1/5" onClick={() => router.push("/student/new")}>
+          <Button className="w-1/5" onClick={() => {}}>
             Export PDF
           </Button>
 

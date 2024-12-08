@@ -8,6 +8,7 @@ export const useUserCoursesList = ({
   limit = 5,
   search = "",
   course_id = "",
+  include_attendance_recap = 0,
 }) => {
   const fetcher = async (url) => {
     const res = await fetch(url, {
@@ -26,7 +27,7 @@ export const useUserCoursesList = ({
   };
 
   const { data, error, isLoading, mutate } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/user-course?page=${page}&limit=${limit}&course_id=${course_id}&search=${search}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/user-course?page=${page}&limit=${limit}&course_id=${course_id}&include_attendance_recap=${include_attendance_recap}&search=${search}`,
     fetcher,
     SWR_CONFIG
   );

@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useCourseDetails } from "@/lib/api/useCourseDetails";
 import { useUserCoursesList } from "@/lib/api/useUserCoursesList";
 import { cn } from "@/lib/utils";
 import { useParams } from "next/navigation";
@@ -23,7 +24,44 @@ const AttendanceRecapTable = () => {
   const userCourses = useUserCoursesList({
     page: currentPage,
     course_id: params?.id,
+    include_attendance_recap: 1,
   });
+
+  const courseDetails = useCourseDetails(params?.id);
+
+  const getAttendanceStatus = (attendance) => {
+    if (attendance?.is_past && !!attendance?.attendance?.record) {
+      switch (attendance?.attendance_record?.status) {
+        case "present":
+          return "H";
+        case "permission":
+          return "I";
+        case "sick":
+          return "S";
+        default:
+          return "A";
+      }
+    }
+
+    if (!attendance?.is_past && !!attendance?.attendance_record) {
+      switch (attendance?.attendance_record?.status) {
+        case "present":
+          return "H";
+        case "permission":
+          return "I";
+        case "sick":
+          return "S";
+        default:
+          return "A";
+      }
+    }
+
+    if (attendance?.is_past && !attendance?.attendance_record) {
+      return "A";
+    }
+
+    return "-";
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -52,7 +90,9 @@ const AttendanceRecapTable = () => {
               </TableHead>
             </TableRow>
             <TableRow>
-              {Array.from({ length: 16 }).map((_, index) => (
+              {Array.from({
+                length: Number(courseDetails?.data?.meetings?.length || 16),
+              }).map((_, index) => (
                 <TableHead
                   key={index}
                   className={cn(
@@ -74,7 +114,7 @@ const AttendanceRecapTable = () => {
                   <TableCell className="text-center">
                     {data?.identification_number}
                   </TableCell>
-                  {Array.from({ length: 16 }).map((_, index) => (
+                  {(data?.attendance_recap || [])?.map((attendance, index) => (
                     <TableCell
                       key={index}
                       className={cn(
@@ -82,7 +122,7 @@ const AttendanceRecapTable = () => {
                         index % 2 === 0 ? "bg-slate-100" : ""
                       )}
                     >
-                      H
+                      {getAttendanceStatus(attendance)}
                     </TableCell>
                   ))}
                 </TableRow>
