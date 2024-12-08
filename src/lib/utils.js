@@ -34,3 +34,9 @@ export const PROTECTED_ROUTES = [
   PATH_NAME.LOCATION_NEW,
   PATH_NAME.ATTENDANCE,
 ];
+
+export const SWR_CONFIG = {
+  revalidateOnFocus: true,
+  revalidateIfStale: true,
+  revalidateOnReconnect: true,
+}

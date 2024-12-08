@@ -1,12 +1,12 @@
 "use client";
 
 import useSWR from "swr";
+import { SWR_CONFIG } from "../utils";
 
 export const useLocationList = ({
   page = 1,
   limit = 5,
   search = "",
-  role = "",
 }) => {
   const fetcher = async (url) => {
     const res = await fetch(url, {
@@ -30,7 +30,8 @@ export const useLocationList = ({
 
   const { data, error, isLoading, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/location?page=${page}&limit=${limit}&search=${search}`,
-    fetcher
+    fetcher,
+    SWR_CONFIG
   );
 
   return {

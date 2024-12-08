@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { SWR_CONFIG } from "../utils";
 
 export const useUserList = ({
   page = 1,
@@ -30,7 +31,8 @@ export const useUserList = ({
 
   const { data, error, isLoading, mutate } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/user?page=${page}&limit=${limit}&search=${search}&role=${role}`,
-    fetcher
+    fetcher,
+    SWR_CONFIG
   );
 
   return {

@@ -36,7 +36,15 @@ const FormSchema = z.object({
         end_time: z.string().min(1, { message: "Jam selesai harus diisi." }),
       })
     )
-    .min(1, { message: "Setidaknya satu sesi harus diisi." }),
+    .min(1, { message: "Setidaknya satu sesi harus diisi." })
+    .refine(
+      (meetings) =>
+        meetings.every((meeting) => meeting.start_time < meeting.end_time),
+      {
+        message: "Jam selesai harus lebih lambat dari jam mulai.",
+        path: ["meetings"],
+      }
+    ),
 });
 
 const CourseForm = ({ defaultValues, onSubmit, mode }) => {
@@ -71,6 +79,21 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
   }, [sessionTotal]);
 
   const isViewMode = mode === "view";
+
+  const renderMinimumDate = (index) => {
+    if (index > 0) {
+      const prevDate = form.getValues(`meetings.${index - 1}.date`);
+      if (prevDate) {
+        const date = new Date(prevDate);
+        date.setDate(date.getDate() + 1); // Tambahkan 1 hari
+        return date.toISOString().split("T")[0]; // Format ke 'YYYY-MM-DD'
+      }
+
+      return undefined;
+    }
+
+    return undefined;
+  };
 
   return (
     <Form {...form}>
@@ -199,6 +222,7 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
                         type="date"
                         className="h-[50px]"
                         disabled={isViewMode}
+                        min={renderMinimumDate(index)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -235,6 +259,10 @@ const CourseForm = ({ defaultValues, onSubmit, mode }) => {
                         type="time"
                         className="h-[50px]"
                         disabled={isViewMode}
+                        min={
+                          form.getValues(`meetings.${index}.start_time`) ||
+                          undefined
+                        }
                       />
                     </FormControl>
                     <FormMessage />

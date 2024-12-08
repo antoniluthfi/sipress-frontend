@@ -3,11 +3,11 @@
 import useSWR from "swr";
 import { SWR_CONFIG } from "../utils";
 
-export const useUserCoursesList = ({
+export const useAttendanceRecordList = ({
   page = 1,
   limit = 5,
   search = "",
-  course_id = "",
+  course_meeting_id = "",
 }) => {
   const fetcher = async (url) => {
     const res = await fetch(url, {
@@ -26,7 +26,7 @@ export const useUserCoursesList = ({
   };
 
   const { data, error, isLoading, mutate } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/user-course?page=${page}&limit=${limit}&course_id=${course_id}&search=${search}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/attendance/records?page=${page}&limit=${limit}&course_meeting_id=${course_meeting_id}&search=${search}`,
     fetcher,
     SWR_CONFIG
   );

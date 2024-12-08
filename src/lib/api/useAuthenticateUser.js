@@ -3,7 +3,7 @@
 import useAuthStore from "@/store/useAuthStore";
 import { usePathname, useRouter } from "next/navigation";
 import useSWR from "swr";
-import { PATH_NAME } from "../utils";
+import { PATH_NAME, SWR_CONFIG } from "../utils";
 
 export const useAuthenticateUser = (route) => {
   const pathName = usePathname();
@@ -34,6 +34,7 @@ export const useAuthenticateUser = (route) => {
       : null, // Hanya fetch jika pathName ada
     fetcher,
     {
+      ...SWR_CONFIG,
       onError: () => {
         removeUser(); // Hapus user jika terjadi error
         router.push(route?.redirectRoute || PATH_NAME.LOGIN);

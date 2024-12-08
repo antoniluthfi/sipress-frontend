@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import useSWR from "swr";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { SWR_CONFIG } from "../utils";
 
 export const useGenerateQrCode = ({ courseMeetingId, enable = false }) => {
   const { toast } = useToast();
@@ -32,11 +34,7 @@ export const useGenerateQrCode = ({ courseMeetingId, enable = false }) => {
       ? `${process.env.NEXT_PUBLIC_API_URL}/qr-code/generate-${courseMeetingId}`
       : null,
     generateQrCodeFetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-      revalidateOnReconnect: false,
-    }
+    SWR_CONFIG
   );
 
   // Refresh QR Code

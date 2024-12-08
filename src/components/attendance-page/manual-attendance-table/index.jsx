@@ -9,9 +9,9 @@ import { format, isBefore, isAfter, addMinutes } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { id } from "date-fns/locale";
-import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
-const DoAttendanceTable = ({ data, courseName }) => {
+const ManualAttendanceTable = ({ data, courseName }) => {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
@@ -19,20 +19,30 @@ const DoAttendanceTable = ({ data, courseName }) => {
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedCourseMeetingId, setSelectedCourseMeetingId] = useState("");
 
-  const isQrCodeDisabled = (date, startTime, endTime) => {
-    const now = new Date();
+  const getStatus = (status) => {
+    switch (status) {
+      case "present":
+        return "HADIR";
+      case "permission":
+        return "IZIN";
+      case "sick":
+        return "SAKIT";
+      default:
+        return "ALFA";
+    }
+  };
 
-    const deviceTimezoneOffset = new Date().getTimezoneOffset();
-    const dateOnly = addMinutes(new Date(date), -deviceTimezoneOffset);
-
-    const startDateTime = new Date(
-      `${dateOnly.toISOString().split("T")[0]}T${startTime}`
-    );
-    const endDateTime = new Date(
-      `${dateOnly.toISOString().split("T")[0]}T${endTime}`
-    );
-
-    return isBefore(now, startDateTime) || isAfter(now, endDateTime);
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "present":
+        return "success";
+      case "permission":
+        return "default";
+      case "sick":
+        return "secondary";
+      default:
+        return "danger";
+    }
   };
 
   const columns = [
@@ -54,76 +64,92 @@ const DoAttendanceTable = ({ data, courseName }) => {
       ),
     },
     {
-      accessorKey: "meeting_number",
+      accessorKey: "user_name",
       header: ({ column }) => (
         <div className="w-full flex items-center justify-center">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Pertemuan ke
+            Nama
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => <div>{row.getValue("user_name")}</div>,
+    },
+    {
+      accessorKey: "identification_number",
+      header: ({ column }) => (
+        <div className="w-full flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            NIM
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => <div>{row.getValue("identification_number")}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: ({ column }) => (
+        <div className="w-full flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Absensi
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("meeting_number")}</div>
+        <div className="text-center">
+          <Badge variant={getStatusColor(row.getValue("status"))}>
+            {getStatus(row.getValue("status"))}
+          </Badge>
+        </div>
       ),
     },
     {
-      accessorKey: "date",
+      accessorKey: "remarks",
       header: ({ column }) => (
         <div className="w-full flex items-center justify-center">
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Tanggal
+            Keterangan
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      ),
+      cell: ({ row }) => <div>{row.getValue("remarks")}</div>,
+    },
+    {
+      accessorKey: "attendance_time",
+      header: ({ column }) => (
+        <div className="w-full flex items-center justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Waktu Absensi
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
       ),
       cell: ({ row }) => {
-        const date = new Date(row.getValue("date"));
-        const formattedDate = format(date, "eeee, dd MMMM yyyy", {
-          locale: id,
-        });
+        const attendanceTime = format(
+          new Date(row.getValue("attendance_time")),
+          "eeee, dd MMMM yyyy HH:mm",
+          { locale: id }
+        );
 
-        return <div className="text-center">{formattedDate}</div>;
-      },
-    },
-    {
-      accessorKey: "start_time",
-      header: ({ column }) => (
-        <div className="w-full flex items-center justify-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Waktu Mulai
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => {
-        const formattedStartTime = row.getValue("start_time").substring(0, 5); // HH:mm
-        return <div className="text-center">{formattedStartTime} WIB</div>;
-      },
-    },
-    {
-      accessorKey: "end_time",
-      header: ({ column }) => (
-        <div className="w-full flex items-center justify-center">
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Waktu Selesai
-          </Button>
-        </div>
-      ),
-      cell: ({ row }) => {
-        const formattedEndTime = row.getValue("end_time").substring(0, 5); // HH:mm
-        return <div className="text-center">{formattedEndTime} WIB</div>;
+        return <div>{attendanceTime} WIB</div>;
       },
     },
     {
@@ -140,39 +166,16 @@ const DoAttendanceTable = ({ data, courseName }) => {
         </div>
       ),
       cell: ({ row }) => {
-        const date = row.getValue("date");
-        const startTime = row.getValue("start_time");
-        const endTime = row.getValue("end_time");
+        const isAbsent = row.getValue("status") === "absent";
 
         return (
           <div className="flex items-center justify-center gap-2">
-            <Link
-              href={`/attendance/do/${
-                params?.id
-              }/manual-attendance/${row.getValue("id")}`}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-[#253763] text-white hover:bg-primary/90 h-10 px-4 py-2"
-            >
-              Absensi Manual
-            </Link>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                const disabled = isQrCodeDisabled(date, startTime, endTime);
-                if (disabled) {
-                  toast({
-                    title: "Failed",
-                    description:
-                      "Kode QR tidak bisa dibuat diluar rentang waktu yang telah ditentukan!",
-                    variant: "danger",
-                  });
-                } else {
-                  setSelectedCourseMeetingId(row.getValue("id"));
-                  setOpenQrCodeModal(true);
-                }
-              }}
-              disabled={isQrCodeDisabled(date, startTime, endTime)}
-            >
-              Absensi Kode QR
+            <Button disabled={!isAbsent}>Hadir</Button>
+            <Button variant="destructive" disabled={!isAbsent}>
+              Izin
+            </Button>
+            <Button variant="destructive" disabled={!isAbsent}>
+              Sakit
             </Button>
           </div>
         );
@@ -195,4 +198,4 @@ const DoAttendanceTable = ({ data, courseName }) => {
   );
 };
 
-export default DoAttendanceTable;
+export default ManualAttendanceTable;

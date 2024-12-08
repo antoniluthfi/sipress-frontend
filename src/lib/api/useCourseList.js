@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import useSWR from "swr";
+import { SWR_CONFIG } from "../utils";
 
 export const useCourseList = ({
   page = 1,
@@ -40,7 +41,7 @@ export const useCourseList = ({
     return url;
   }, [page, limit, search, lecturer_id, include_upcoming_schedule]);
 
-  const { data, error, isLoading, mutate } = useSWR(apiUrl, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, fetcher, SWR_CONFIG);
 
   return {
     data: data?.data || null,

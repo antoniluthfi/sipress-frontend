@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import { SWR_CONFIG } from "../utils";
 
 export const useUserDetails = (id) => {
   const fetcher = async (url) => {
@@ -22,7 +23,8 @@ export const useUserDetails = (id) => {
 
   const { data, error, isLoading, mutate } = useSWR(
     id ? `${process.env.NEXT_PUBLIC_API_URL}/user/${id}` : null, // Hanya fetch jika ID tersedia
-    fetcher
+    fetcher,
+    SWR_CONFIG
   );
 
   return {
