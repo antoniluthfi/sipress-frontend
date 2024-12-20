@@ -4,6 +4,7 @@ import AttendanceRecapTable from "@/components/attendance-page/attendance-recap-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
+import { useDownloadAttendanceRecapReport } from "@/lib/api/useDownloadAttendanceRecapReport";
 import { ArrowLeftIcon } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
@@ -12,6 +13,8 @@ const AttendanceRecapPage = () => {
   const params = useParams();
   const router = useRouter();
   useAuthenticateUser({ authenticatedRedirectRoute: pathname });
+
+  const { downloadPDF } = useDownloadAttendanceRecapReport();
 
   return (
     <div className="w-full flex flex-1 flex-col gap-10 overflow-hidden">
@@ -26,8 +29,15 @@ const AttendanceRecapPage = () => {
 
       <Card className="h-3/4 w-full overflow-hidden">
         <CardContent className="flex flex-col gap-5 px-5 py-10">
-          <Button className="w-1/5" onClick={() => {}}>
-            Export PDF
+          <Button
+            className="w-1/5"
+            onClick={() => {
+              downloadPDF({
+                course_id: params?.id,
+              });
+            }}
+          >
+            Download Rekap Absensi
           </Button>
 
           <AttendanceRecapTable />
