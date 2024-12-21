@@ -30,7 +30,7 @@ const AttendanceRecapTable = () => {
   const courseDetails = useCourseDetails(params?.id);
 
   const getAttendanceStatus = (attendance) => {
-    if (attendance?.is_past && !!attendance?.attendance?.record) {
+    if (attendance?.is_past && !!attendance?.attendance_record) {
       switch (attendance?.attendance_record?.status) {
         case "present":
           return "H";
