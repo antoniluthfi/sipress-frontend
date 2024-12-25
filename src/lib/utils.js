@@ -40,3 +40,5 @@ export const SWR_CONFIG = {
   revalidateIfStale: true,
   revalidateOnReconnect: true,
 }
+
+export const isDev = process.env.NODE_ENV === 'development';

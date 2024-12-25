@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useAuthenticateUser } from "@/lib/api/useAuthenticateUser";
 import { useToast } from "@/components/ui/use-toast";
+import { isDev } from "@/lib/utils";
 
 const FormSchema = z.object({
   email: z
@@ -34,10 +35,10 @@ const LoginPage = () => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      // email: "dosen1@gmail.com",
-      // password: "12345678",
-      email: "antoni10@gmail.com",
-      password: "12345678",
+      // email: isDev ? "dosen1@gmail.com" : "",
+      // password: isDev ? "12345678" : "",
+      email: isDev ? "antoni10@gmail.com" : "",
+      password: isDev ? "12345678" : "",
     },
   });
 

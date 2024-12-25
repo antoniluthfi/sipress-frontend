@@ -10,14 +10,17 @@ import { useToast } from "@/components/ui/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
+import PermissionRequestModal from "../permission-request-modal";
 
-const ManualAttendanceTable = ({ data, courseName }) => {
+const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
 
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [selectedCourseMeetingId, setSelectedCourseMeetingId] = useState("");
+  const [openPermissionRequest, setOpenPermissionRequest] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const getStatus = (status) => {
     switch (status) {
@@ -27,8 +30,10 @@ const ManualAttendanceTable = ({ data, courseName }) => {
         return "IZIN";
       case "sick":
         return "SAKIT";
-      default:
+      case "absent":
         return "ALFA";
+      default:
+        return "BELUM ABSEN";
     }
   };
 
@@ -47,7 +52,7 @@ const ManualAttendanceTable = ({ data, courseName }) => {
 
   const columns = [
     {
-      accessorKey: "id",
+      accessorKey: "user_id",
       header: ({ column }) => (
         <div className="w-full flex items-center justify-center">
           <Button
@@ -60,7 +65,7 @@ const ManualAttendanceTable = ({ data, courseName }) => {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="text-center">{row.getValue("id")}</div>
+        <div className="text-center">{row.getValue("user_id")}</div>
       ),
     },
     {
@@ -143,13 +148,19 @@ const ManualAttendanceTable = ({ data, courseName }) => {
         </div>
       ),
       cell: ({ row }) => {
-        const attendanceTime = format(
-          new Date(row.getValue("attendance_time")),
-          "eeee, dd MMMM yyyy HH:mm",
-          { locale: id }
-        );
+        const attendanceTime = row.getValue("attendance_time");
 
-        return <div>{attendanceTime} WIB</div>;
+        if (attendanceTime) {
+          const formattedAttendanceTime = format(
+            new Date(row.getValue("attendance_time")),
+            "eeee, dd MMMM yyyy HH:mm",
+            { locale: id }
+          );
+
+          return <div>{formattedAttendanceTime} WIB</div>;
+        }
+
+        return <div>{attendanceTime}</div>;
       },
     },
     {
@@ -166,15 +177,24 @@ const ManualAttendanceTable = ({ data, courseName }) => {
         </div>
       ),
       cell: ({ row }) => {
-        const isAbsent = row.getValue("status") === "absent";
+        const attendanceTime = row.getValue("attendance_time");
 
         return (
           <div className="flex items-center justify-center gap-2">
-            <Button disabled={!isAbsent}>Hadir</Button>
-            <Button variant="destructive" disabled={!isAbsent}>
+            <Button disabled={!!attendanceTime}>Hadir</Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                const id = row.getValue("user_id");
+
+                setSelectedStudentId(id);
+                setOpenPermissionRequest(true);
+              }}
+              disabled={!!attendanceTime}
+            >
               Izin
             </Button>
-            <Button variant="destructive" disabled={!isAbsent}>
+            <Button variant="destructive" disabled={!!attendanceTime}>
               Sakit
             </Button>
           </div>
@@ -192,6 +212,19 @@ const ManualAttendanceTable = ({ data, courseName }) => {
         isModalOpen={openQrCodeModal}
         closeModal={() => {
           setOpenQrCodeModal(false);
+        }}
+      />
+      <PermissionRequestModal
+        studentId={selectedStudentId}
+        isModalOpen={openPermissionRequest}
+        closeModal={() => {
+          setOpenPermissionRequest(false);
+          setSelectedStudentId("");
+        }}
+        onSuccess={() => {
+          refreshData();
+          setOpenPermissionRequest(false);
+          setSelectedStudentId("");
         }}
       />
     </>

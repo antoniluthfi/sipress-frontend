@@ -21,20 +21,26 @@ const ManualAttendance = () => {
   const { data: courseData, isLoading: courseLoading } = useCourseDetails(
     params?.id
   );
-  const { data: userCourseData, isLoading: userCourseLoading } =
+  const { data: userCourseData, isLoading: userCourseLoading, refetch: refetchUserCourseList } =
     useUserCoursesList({
       limit: 10,
       course_id: params?.id,
     });
 
-  const { data: attendanceRecordData, isLoading: attendanceRecordLoading } =
+  const { data: attendanceRecordData, isLoading: attendanceRecordLoading, refetch: refetchAttendanceRecordList } =
     useAttendanceRecordList({
       limit: 10,
       course_id: params?.id,
+      course_meeting_id: params?.courseMeetingId,
     });
 
+  const refreshData = async () => {
+    await refetchUserCourseList();
+    await refetchAttendanceRecordList();
+  }
+
   const finalUserCourseData = useMemo(() => {
-    if (userCourseData?.length && attendanceRecordData?.length) {
+    if (userCourseData?.length) {
       const res = userCourseData?.map((data) => {
         const selectedAttendanceRecord = attendanceRecordData?.find(
           (attendance) => attendance?.student?.name === data?.user_name
@@ -87,6 +93,7 @@ const ManualAttendance = () => {
           <ManualAttendanceTable
             data={finalUserCourseData}
             courseName={courseData?.name}
+            refreshData={refreshData}
           />
         </CardContent>
       </Card>
