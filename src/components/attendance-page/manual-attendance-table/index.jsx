@@ -5,21 +5,20 @@ import { ArrowUpDown } from "lucide-react";
 import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import GenerateQrCodeModal from "../generate-qr-code-modal";
-import { format, isBefore, isAfter, addMinutes } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
-import { useParams, useRouter } from "next/navigation";
+import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import PermissionRequestModal from "../permission-request-modal";
+import SickRequestModal from "../sick-request-modal";
+import { useParams } from "next/navigation";
+import Image from "next/image";
 
 const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
-  const router = useRouter();
   const params = useParams();
-  const { toast } = useToast();
 
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
-  const [selectedCourseMeetingId, setSelectedCourseMeetingId] = useState("");
   const [openPermissionRequest, setOpenPermissionRequest] = useState(false);
+  const [openSickRequest, setOpenSickRequest] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const getStatus = (status) => {
@@ -164,6 +163,39 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
       },
     },
     {
+      accessorKey: "file_path",
+      header: ({ column }) => (
+        <div className="w-full flex items-center justify-center">
+          <Button variant="ghost">Gambar</Button>
+        </div>
+      ),
+      cell: ({ row }) => {
+        if (row.getValue("file_path")) {
+          const imageLink =
+            process.env.NEXT_PUBLIC_BE_URL + row.getValue("file_path");
+
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                window.open(imageLink, "_blank");
+              }}
+            >
+              <Image
+                src={imageLink}
+                width={150}
+                height={150}
+                alt="attendance image"
+                priority
+              />
+            </div>
+          );
+        }
+
+        return;
+      },
+    },
+    {
       accessorKey: "functions",
       header: ({ column }) => (
         <div className="w-full flex items-center justify-center">
@@ -194,7 +226,16 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
             >
               Izin
             </Button>
-            <Button variant="destructive" disabled={!!attendanceTime}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                const id = row.getValue("user_id");
+
+                setSelectedStudentId(id);
+                setOpenSickRequest(true);
+              }}
+              disabled={!!attendanceTime}
+            >
               Sakit
             </Button>
           </div>
@@ -207,7 +248,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
     <>
       <DataTable columns={columns} data={data} />
       <GenerateQrCodeModal
-        courseMeetingId={selectedCourseMeetingId}
+        courseMeetingId={params?.courseMeetingId}
         courseName={courseName}
         isModalOpen={openQrCodeModal}
         closeModal={() => {
@@ -224,6 +265,19 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
         onSuccess={() => {
           refreshData();
           setOpenPermissionRequest(false);
+          setSelectedStudentId("");
+        }}
+      />
+      <SickRequestModal
+        studentId={selectedStudentId}
+        isModalOpen={openSickRequest}
+        closeModal={() => {
+          setOpenSickRequest(false);
+          setSelectedStudentId("");
+        }}
+        onSuccess={() => {
+          refreshData();
+          setOpenSickRequest(false);
           setSelectedStudentId("");
         }}
       />

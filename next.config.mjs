@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "presensi.antonidev.com",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+      },
     ],
   },
   webpack: (config) => {

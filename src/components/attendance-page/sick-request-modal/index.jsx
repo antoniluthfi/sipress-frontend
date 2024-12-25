@@ -21,14 +21,17 @@ import { useParams } from "next/navigation";
 
 const formSchema = z.object({
   remarks: z.string().min(1, "Keterangan wajib diisi."),
-  file: z
-    .custom((value) => value instanceof File, {
-      message: "Gambar wajib diunggah.",
-    })
-    .optional(),
+  file: z.custom((value) => value instanceof File, {
+    message: "Gambar wajib diunggah.",
+  }),
 });
 
-const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess }) => {
+const SickRequestModal = ({
+  studentId,
+  isModalOpen,
+  closeModal,
+  onSuccess,
+}) => {
   const params = useParams();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,14 +61,14 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
     const { remarks, file } = data;
 
     const formData = new FormData();
-    formData.append('course_meeting_id', params?.courseMeetingId || '');
-    formData.append('course_id', params?.id || '');
-    formData.append('student_id', studentId || '');
-    formData.append('latitude', '');
-    formData.append('longitude', '');
-    formData.append('qr_code', '');
-    formData.append('status', 'permission');
-    formData.append('remarks', remarks);
+    formData.append("course_meeting_id", params?.courseMeetingId || "");
+    formData.append("course_id", params?.id || "");
+    formData.append("student_id", studentId || "");
+    formData.append("latitude", "");
+    formData.append("longitude", "");
+    formData.append("qr_code", "");
+    formData.append("status", "sick");
+    formData.append("remarks", remarks);
 
     if (file) {
       formData.append("file", file);
@@ -73,18 +76,20 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
 
     try {
       setIsSubmitting(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/attendance/record`, {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/attendance/record`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         const response = await res.json();
         toast({
           title: "Success",
-          description:
-            response?.message || "Izin berhasil ditambahkan.",
+          description: response?.message || "Izin berhasil ditambahkan.",
           variant: "success",
         });
         onSuccess?.();
@@ -119,7 +124,7 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
       }}
       className="flex flex-col gap-5 items-center justify-center"
     >
-      <h2 className="text-xl font-bold">Form Izin</h2>
+      <h2 className="text-xl font-bold">Form Sakit</h2>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -147,7 +152,7 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
             name="file"
             render={() => (
               <FormItem>
-                <FormLabel>Gambar (Opsional)</FormLabel>
+                <FormLabel>Gambar</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
@@ -198,4 +203,4 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
   );
 };
 
-export default PermissionRequestModal;
+export default SickRequestModal;
