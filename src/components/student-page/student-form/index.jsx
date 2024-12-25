@@ -46,6 +46,18 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validasi ukuran file maksimal 2 MB
+      const maxSizeInMB = 2;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        toast({
+          title: "File Terlalu Besar",
+          description: `Ukuran file tidak boleh lebih dari ${maxSizeInMB} MB.`,
+          variant: "danger",
+        });
+        return;
+      }
+
       form.setValue("profile_url", file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
@@ -237,6 +249,7 @@ const StudentForm = ({ mode, defaultValues, onSubmit }) => {
               width={300} // Ganti sesuai kebutuhan
               height={200} // Ganti sesuai kebutuhan
               className="max-w-sm h-auto"
+              priority
             />
           </div>
         )}

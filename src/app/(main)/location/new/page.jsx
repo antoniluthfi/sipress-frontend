@@ -16,13 +16,20 @@ const AddNewLocationComponent = () => {
   const { toast } = useToast();
 
   const handleSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append('name', data?.name || '');
+    formData.append('longitude', data?.longitude || '');
+    formData.append('latitude', data?.latitude || '');
+    formData.append('radius', data?.radius || '');
+
+    if (data?.file_path) {
+      formData.append('file', data?.file_path || '');
+    }
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/location`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData,
         credentials: "include",
       });
 
@@ -71,6 +78,7 @@ const AddNewLocationComponent = () => {
               longitude: "",
               latitude: "",
               radius: "",
+              file_path: "",
             }}
             onSubmit={handleSubmit}
           />

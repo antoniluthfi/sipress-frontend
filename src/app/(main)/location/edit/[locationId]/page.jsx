@@ -19,16 +19,23 @@ const EditLocationComponent = () => {
   const { toast } = useToast();
   const { data, isLoading } = useLocationDetails(params?.locationId);
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append('name', data?.name || '');
+    formData.append('longitude', data?.longitude || '');
+    formData.append('latitude', data?.latitude || '');
+    formData.append('radius', data?.radius || '');
+
+    if (data?.file_path) {
+      formData.append('file', data?.file_path || '');
+    }
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/location/${params?.locationId}`,
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          method: "POST",
+          body: formData,
           credentials: "include",
         }
       );

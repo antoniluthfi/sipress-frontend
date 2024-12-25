@@ -45,6 +45,18 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validasi ukuran file maksimal 2 MB
+      const maxSizeInMB = 2;
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        toast({
+          title: "File Terlalu Besar",
+          description: `Ukuran file tidak boleh lebih dari ${maxSizeInMB} MB.`,
+          variant: "danger",
+        });
+        return;
+      }
+      
       form.setValue("file", file);
       const previewUrl = URL.createObjectURL(file);
       setImagePreview(previewUrl);
@@ -53,7 +65,7 @@ const PermissionRequestModal = ({ studentId, isModalOpen, closeModal, onSuccess 
       setImagePreview(null);
     }
   };
-
+  
   const onSubmit = async (data) => {
     const { remarks, file } = data;
 
