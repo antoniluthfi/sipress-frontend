@@ -17,6 +17,7 @@ import useDebounce from "@/lib/hooks/useDebounce";
 import CustomPagination from "@/components/custom-pagination";
 import { useLocationList } from "@/lib/api/useLocationList";
 import DeleteLocationModal from "../delete-location-modal";
+import Image from "next/image";
 
 const LocationTable = () => {
   const router = useRouter();
@@ -140,6 +141,41 @@ const LocationTable = () => {
       ),
     },
     {
+      accessorKey: "file_path",
+      header: ({ column }) => {
+        return (
+          <div className="w-full flex items-center justify-center">
+            <Button variant="ghost">Radius (meter)</Button>
+          </div>
+        );
+      },
+      cell: ({ row }) => {
+        if (row.getValue("file_path")) {
+          const imageLink =
+            process.env.NEXT_PUBLIC_BE_URL + row.getValue("file_path");
+
+          return (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                window.open(imageLink, "_blank");
+              }}
+            >
+              <Image
+                src={imageLink}
+                width={150}
+                height={150}
+                alt="attendance image"
+                priority
+              />
+            </div>
+          );
+        }
+
+        return;
+      },
+    },
+    {
       accessorKey: "functions",
       header: ({ column }) => {
         return (
@@ -200,7 +236,7 @@ const LocationTable = () => {
         return acc;
       }, {});
     }
-  
+
     return {};
   }, [columns.length]);
 

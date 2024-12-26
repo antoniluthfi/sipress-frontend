@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import DeleteStudentModal from "../delete-student-modal";
+import ResetLoginModal from "../reset-login-modal";
 import useDebounce from "@/lib/hooks/useDebounce";
 import { useUserList } from "@/lib/api/useUserList";
 import CustomPagination from "@/components/custom-pagination";
@@ -22,6 +23,7 @@ import CustomPagination from "@/components/custom-pagination";
 const StudentTable = () => {
   const router = useRouter();
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openResetLoginModal, setOpenResetLoginModal] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedId, setSelectedId] = useState("");
@@ -217,6 +219,14 @@ const StudentTable = () => {
               >
                 Hapus
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  setSelectedId(row.getValue("id"));
+                  setOpenResetLoginModal(true);
+                }}
+              >
+                Reset Login
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -232,10 +242,10 @@ const StudentTable = () => {
         return acc;
       }, {});
     }
-  
+
     return {};
   }, [columns.length]);
-  
+
   return (
     <>
       <DataTable
@@ -264,6 +274,15 @@ const StudentTable = () => {
         selectedId={selectedId}
         isModalOpen={openDeleteModal}
         closeModal={() => setOpenDeleteModal(false)}
+        onSuccess={() => {
+          students.refetch();
+        }}
+      />
+
+      <ResetLoginModal
+        selectedId={selectedId}
+        isModalOpen={openResetLoginModal}
+        closeModal={() => setOpenResetLoginModal(false)}
         onSuccess={() => {
           students.refetch();
         }}
