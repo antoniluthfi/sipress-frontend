@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { ArrowLeftCircleIcon, ArrowRightCircleIcon } from "lucide-react";
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 
-const images = [
+const dummyImages = [
   "https://dummyimage.com/600x240/8c8c8c/000000",
   "https://dummyimage.com/600x240/8c8c8c/000000",
   "https://dummyimage.com/600x240/8c8c8c/000000",
@@ -16,8 +16,16 @@ const images = [
   "https://dummyimage.com/600x240/8c8c8c/000000",
 ];
 
-const Carousel = () => {
+const Carousel = ({ data = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const images = useMemo(() => {
+    if (data?.length > 0) {
+      return data?.map((announcement) => announcement?.img);
+    }
+
+    return dummyImages;
+  }, [data?.length]);
 
   const totalSlides = Math.ceil(images.length / 3);
 
@@ -42,7 +50,11 @@ const Carousel = () => {
             {images
               .slice(slideIndex * 3, slideIndex * 3 + 3)
               .map((image, index) => (
-                <div key={index} className="relative w-full h-[180px]">
+                <div
+                  key={index}
+                  className="relative w-full h-[180px] cursor-pointer"
+                  onClick={() => window.open(data?.[index]?.href, "_blank")}
+                >
                   <Image
                     src={image}
                     alt={`Slide ${slideIndex * 3 + index}`}
@@ -72,4 +84,4 @@ const Carousel = () => {
   );
 };
 
-export default Carousel;
+export default memo(Carousel);

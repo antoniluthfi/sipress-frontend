@@ -18,6 +18,10 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "if.unsil.ac.id",
+      }
     ],
   },
   webpack: (config) => {

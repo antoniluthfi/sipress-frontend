@@ -155,45 +155,58 @@ const Sidebar = () => {
         </nav>
       ) : (
         <nav className="flex flex-col flex-1">
-          {MENU.map((data) => (
-            <Tooltip key={data.title} delayDuration={0}>
-              <TooltipTrigger asChild>
-                {data.title === "Logout" && (
+          {MENU.map((data) => {
+            const renderTrigger = () => {
+              if (data.title === "Logout") {
+                return (
                   <button
-                    key={data.title}
                     type="button"
                     className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
                     onClick={logout}
                   >
                     {data.icon}
                   </button>
-                )}
+                );
+              }
 
-                {!data.needAdminAccess && user?.role === "lecturer" && (
+              if (!data.needAdminAccess && user?.role === "lecturer") {
+                return (
                   <Link
-                    key={data.title}
                     href={data.href}
                     className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
                   >
                     {data.icon}
                   </Link>
-                )}
+                );
+              }
 
-                {user?.role === "admin" && (
+              if (user?.role === "admin" && data.title !== "Logout") {
+                return (
                   <Link
-                    key={data.title}
                     href={data.href}
                     className="flex items-center justify-center py-[15px] lg:py-[30px] hover:bg-white hover:text-[#253763] text-base lg:text-xl font-semibold"
                   >
                     {data.icon}
                   </Link>
-                )}
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>{data.title}</p>
-              </TooltipContent>
-            </Tooltip>
-          ))}
+                );
+              }
+
+              return null;
+            };
+
+            const triggerElement = renderTrigger();
+
+            if (!triggerElement) return null;
+
+            return (
+              <Tooltip key={data.title} delayDuration={0}>
+                <TooltipTrigger asChild>{triggerElement}</TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{data.title}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
         </nav>
       )}
     </div>
