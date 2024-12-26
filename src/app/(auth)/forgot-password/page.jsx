@@ -25,9 +25,6 @@ const FormSchema = z.object({
     .string()
     .email({ message: "Email tidak valid." })
     .min(1, { message: "Email harus diisi." }),
-  password: z
-    .string()
-    .min(8, { message: "Password harus minimal 8 karakter." }),
 });
 
 const LoginPage = () => {
@@ -36,9 +33,7 @@ const LoginPage = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       // email: isDev ? "dosen1@gmail.com" : "",
-      // password: isDev ? "12345678" : "",
       email: isDev ? "antoni10@gmail.com" : "",
-      password: isDev ? "12345678" : "",
     },
   });
 
@@ -46,20 +41,27 @@ const LoginPage = () => {
   useAuthenticateUser();
 
   const onSubmit = async (data) => {
-    const { email, password } = data;
+    const { email } = data;
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, scope: "portal" }),
+        body: JSON.stringify({ email }),
         credentials: "include",
       });
 
       if (res.ok) {
-        router.push("/dashboard");
+        const response = await res.json();
+
+        toast({
+          title: "Success",
+          description: response?.message,
+          variant: "success",
+        });
+        router.push("/login");
       } else {
         const errorData = await res.json();
         toast({
@@ -90,7 +92,7 @@ const LoginPage = () => {
             priority
           />
           <h2 className="text-white text-4xl font-bold text-center">
-            LOGIN KE AKUN ANDA
+            LUPA PASSWORD
           </h2>
         </div>
         <Form {...form}>
@@ -116,38 +118,11 @@ const LoginPage = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="password"
-                        placeholder="Password"
-                        className="h-[50px]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <div className="w-full flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="terms2" />
-                <label
-                  htmlFor="terms2"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Ingat Saya
-                </label>
-              </div>
-
-              <Link href="/forgot-password" className="text-[#1E73BE]">
-                Lupa Password?
+              <Link href="/login" className="text-[#1E73BE]">
+                Login
               </Link>
             </div>
 
@@ -155,7 +130,7 @@ const LoginPage = () => {
               type="submit"
               className="w-full h-[60px] bg-[#253763] rounded-md text-2xl"
             >
-              Login
+              Kirim Email
             </Button>
           </form>
         </Form>
