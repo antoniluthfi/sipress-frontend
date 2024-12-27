@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import GenerateQrCodeModal from "../generate-qr-code-modal";
 import { format, isBefore, isAfter, addMinutes } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { id } from "date-fns/locale";
 import Link from "next/link";
 
 const DoAttendanceTable = ({ data, courseName }) => {
-  const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
 
@@ -52,6 +51,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
       cell: ({ row }) => (
         <div className="text-center">{row.getValue("id")}</div>
       ),
+      alias: "ID",
     },
     {
       accessorKey: "meeting_number",
@@ -69,6 +69,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
       cell: ({ row }) => (
         <div className="text-center">{row.getValue("meeting_number")}</div>
       ),
+      alias: "Pertemuan ke",
     },
     {
       accessorKey: "date",
@@ -91,6 +92,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
 
         return <div className="text-center">{formattedDate}</div>;
       },
+      alias: "Tanggal",
     },
     {
       accessorKey: "start_time",
@@ -108,6 +110,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
         const formattedStartTime = row.getValue("start_time").substring(0, 5); // HH:mm
         return <div className="text-center">{formattedStartTime} WIB</div>;
       },
+      alias: "Waktu Mulai",
     },
     {
       accessorKey: "end_time",
@@ -125,6 +128,7 @@ const DoAttendanceTable = ({ data, courseName }) => {
         const formattedEndTime = row.getValue("end_time").substring(0, 5); // HH:mm
         return <div className="text-center">{formattedEndTime} WIB</div>;
       },
+      alias: "Waktu Selesai",
     },
     {
       accessorKey: "functions",
@@ -177,12 +181,24 @@ const DoAttendanceTable = ({ data, courseName }) => {
           </div>
         );
       },
+      alias: "Aksi",
     },
   ];
 
+  const columnFilter = useMemo(() => {
+    if (columns.length) {
+      return columns.reduce((acc, col) => {
+        acc[col.accessorKey] = col.alias;
+        return acc;
+      }, {});
+    }
+
+    return {};
+  }, [columns.length]);
+
   return (
     <>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} columnFilter={columnFilter} data={data} />
       <GenerateQrCodeModal
         courseMeetingId={selectedCourseMeetingId}
         courseName={courseName}

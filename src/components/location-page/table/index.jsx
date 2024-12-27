@@ -145,7 +145,7 @@ const LocationTable = () => {
       header: ({ column }) => {
         return (
           <div className="w-full flex items-center justify-center">
-            <Button variant="ghost">Radius (meter)</Button>
+            <Button variant="ghost">Denah</Button>
           </div>
         );
       },
@@ -174,6 +174,7 @@ const LocationTable = () => {
 
         return;
       },
+      alias: "Denah",
     },
     {
       accessorKey: "functions",

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ArrowUpDown } from "lucide-react";
 import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import PermissionRequestModal from "../permission-request-modal";
 import SickRequestModal from "../sick-request-modal";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import PresentModal from "../present-modal";
 
 const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
   const params = useParams();
@@ -19,6 +20,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
   const [openQrCodeModal, setOpenQrCodeModal] = useState(false);
   const [openPermissionRequest, setOpenPermissionRequest] = useState(false);
   const [openSickRequest, setOpenSickRequest] = useState(false);
+  const [openPresent, setOpenPresent] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState("");
 
   const getStatus = (status) => {
@@ -66,6 +68,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
       cell: ({ row }) => (
         <div className="text-center">{row.getValue("user_id")}</div>
       ),
+      alias: "ID",
     },
     {
       accessorKey: "user_name",
@@ -81,6 +84,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
         </div>
       ),
       cell: ({ row }) => <div>{row.getValue("user_name")}</div>,
+      alias: "Nama",
     },
     {
       accessorKey: "identification_number",
@@ -96,6 +100,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
         </div>
       ),
       cell: ({ row }) => <div>{row.getValue("identification_number")}</div>,
+      alias: "NIM",
     },
     {
       accessorKey: "status",
@@ -117,6 +122,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
           </Badge>
         </div>
       ),
+      alias: "Absensi",
     },
     {
       accessorKey: "remarks",
@@ -132,6 +138,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
         </div>
       ),
       cell: ({ row }) => <div>{row.getValue("remarks")}</div>,
+      alias: "Keterangan",
     },
     {
       accessorKey: "attendance_time",
@@ -161,6 +168,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
 
         return <div>{attendanceTime}</div>;
       },
+      alias: "Waktu Absensi",
     },
     {
       accessorKey: "file_path",
@@ -194,6 +202,7 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
 
         return;
       },
+      alias: "Gambar",
     },
     {
       accessorKey: "functions",
@@ -213,7 +222,17 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
 
         return (
           <div className="flex items-center justify-center gap-2">
-            <Button disabled={!!attendanceTime}>Hadir</Button>
+            <Button
+              disabled={!!attendanceTime}
+              onClick={() => {
+                const id = row.getValue("user_id");
+
+                setSelectedStudentId(id);
+                setOpenPresent(true);
+              }}
+            >
+              Hadir
+            </Button>
             <Button
               variant="destructive"
               onClick={() => {
@@ -241,12 +260,24 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
           </div>
         );
       },
+      alias: "Aksi",
     },
   ];
 
+  const columnFilter = useMemo(() => {
+    if (columns.length) {
+      return columns.reduce((acc, col) => {
+        acc[col.accessorKey] = col.alias;
+        return acc;
+      }, {});
+    }
+
+    return {};
+  }, [columns.length]);
+
   return (
     <>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} columnFilter={columnFilter} data={data} />
       <GenerateQrCodeModal
         courseMeetingId={params?.courseMeetingId}
         courseName={courseName}
@@ -278,6 +309,19 @@ const ManualAttendanceTable = ({ data, courseName, refreshData }) => {
         onSuccess={() => {
           refreshData();
           setOpenSickRequest(false);
+          setSelectedStudentId("");
+        }}
+      />
+      <PresentModal
+        studentId={selectedStudentId}
+        isModalOpen={openPresent}
+        closeModal={() => {
+          setOpenPresent(false);
+          setSelectedStudentId("");
+        }}
+        onSuccess={() => {
+          refreshData();
+          setOpenPresent(false);
           setSelectedStudentId("");
         }}
       />
